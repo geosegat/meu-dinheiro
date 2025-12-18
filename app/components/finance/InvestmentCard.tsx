@@ -94,13 +94,21 @@ export default function InvestmentCard({
         <div className="bg-blue-50 rounded-lg p-3">
           <p className="text-xs text-blue-600 mb-1">Valor Investido</p>
           <p className="text-lg font-bold text-blue-900">
-            R$ {investment.valor_inicial.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            R${' '}
+            {investment.valor_inicial.toLocaleString('pt-BR', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
           </p>
         </div>
         <div className="bg-emerald-50 rounded-lg p-3">
           <p className="text-xs text-emerald-600 mb-1">Saldo Atual</p>
           <p className="text-lg font-bold text-emerald-900">
-            R$ {dados.saldoAtual.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            R${' '}
+            {dados.saldoAtual.toLocaleString('pt-BR', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
           </p>
         </div>
       </div>
@@ -109,25 +117,41 @@ export default function InvestmentCard({
         <div className="flex items-center justify-between text-sm">
           <span className="text-gray-600">Rendimento/dia</span>
           <span className="font-semibold text-gray-900">
-            R$ {dados.rendimentoDiario.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            R${' '}
+            {dados.rendimentoDiario.toLocaleString('pt-BR', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
           </span>
         </div>
         <div className="flex items-center justify-between text-sm">
           <span className="text-gray-600">Rendimento bruto</span>
           <span className="font-semibold text-gray-900">
-            R$ {dados.rendimentoBruto.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            R${' '}
+            {dados.rendimentoBruto.toLocaleString('pt-BR', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
           </span>
         </div>
         <div className="flex items-center justify-between text-sm">
           <span className="text-gray-600">IR ({dados.aliquotaIR}%)</span>
           <span className="font-semibold text-rose-600">
-            - R$ {dados.ir.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            - R${' '}
+            {dados.ir.toLocaleString('pt-BR', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
           </span>
         </div>
         <div className="flex items-center justify-between text-sm pt-2 border-t border-gray-200">
           <span className="text-gray-700 font-medium">Rendimento líquido</span>
           <span className="font-bold text-emerald-600">
-            R$ {dados.rendimentoLiquido.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            R${' '}
+            {dados.rendimentoLiquido.toLocaleString('pt-BR', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
           </span>
         </div>
       </div>

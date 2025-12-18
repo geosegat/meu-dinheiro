@@ -101,7 +101,11 @@ export default function InvestimentosPage() {
                 <span className="text-sm opacity-90">Total Investido</span>
               </div>
               <p className="text-3xl font-bold">
-                R$ {totalInvestido.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                R${' '}
+                {totalInvestido.toLocaleString('pt-BR', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
               </p>
             </motion.div>
 
@@ -116,7 +120,11 @@ export default function InvestimentosPage() {
                 <span className="text-sm opacity-90">Rendimento Líquido</span>
               </div>
               <p className="text-3xl font-bold">
-                R$ {totalRendimentoLiquido.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                R${' '}
+                {totalRendimentoLiquido.toLocaleString('pt-BR', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
               </p>
             </motion.div>
 
@@ -131,7 +139,11 @@ export default function InvestimentosPage() {
                 <span className="text-sm opacity-90">Saldo Total</span>
               </div>
               <p className="text-3xl font-bold">
-                R$ {totalSaldo.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                R${' '}
+                {totalSaldo.toLocaleString('pt-BR', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
               </p>
             </motion.div>
 
@@ -146,12 +158,17 @@ export default function InvestimentosPage() {
                 <span className="text-sm opacity-90">Rendimento/Dia</span>
               </div>
               <p className="text-3xl font-bold">
-                R$ {rendimentoDiarioTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                R${' '}
+                {rendimentoDiarioTotal.toLocaleString('pt-BR', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
               </p>
               <p className="text-xs opacity-75 mt-1">
                 ~R${' '}
                 {(rendimentoDiarioTotal * 30).toLocaleString('pt-BR', {
                   minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
                 })}
                 /mês
               </p>
