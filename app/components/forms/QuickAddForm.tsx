@@ -31,7 +31,7 @@ export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickA
       id: Date.now(),
       type,
       category: selectedCategory.name,
-      amount: parseFloat(amount.replace(',', '.')),
+      amount: parseFloat(amount),
       description,
       date: new Date().toISOString(),
     });
@@ -47,6 +47,18 @@ export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickA
     setAmount('');
     setDescription('');
     onOpenChange(false);
+  };
+
+  const formatCurrencyInput = (value: string) => {
+    const numbers = value.replace(/\D/g, '');
+    if (!numbers) return '';
+    const amount = parseInt(numbers) / 100;
+    return amount.toFixed(2);
+  };
+
+  const handleAmountChange = (value: string) => {
+    const formatted = formatCurrencyInput(value);
+    setAmount(formatted);
   };
 
   return (
@@ -84,9 +96,10 @@ export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickA
             <p className="text-sm font-medium text-gray-700 mb-2">Valor (R$)</p>
             <Input
               type="text"
+              inputMode="numeric"
               placeholder="0,00"
               value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              onChange={(e) => handleAmountChange(e.target.value)}
               className="text-2xl font-bold h-14 text-center"
             />
           </div>

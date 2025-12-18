@@ -73,6 +73,18 @@ export default function InvestmentForm({
     onOpenChange(false);
   };
 
+  const formatCurrencyInput = (value: string) => {
+    const numbers = value.replace(/\D/g, '');
+    if (!numbers) return '';
+    const amount = parseInt(numbers) / 100;
+    return amount.toFixed(2);
+  };
+
+  const handleValueChange = (value: string) => {
+    const formatted = formatCurrencyInput(value);
+    setFormData({ ...formData, valor_inicial: formatted });
+  };
+
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md">
@@ -104,11 +116,11 @@ export default function InvestmentForm({
             </Label>
             <Input
               id="valor"
-              type="number"
-              step="0.01"
+              type="text"
+              inputMode="numeric"
               placeholder="0,00"
               value={formData.valor_inicial}
-              onChange={(e) => setFormData({ ...formData, valor_inicial: e.target.value })}
+              onChange={(e) => handleValueChange(e.target.value)}
               className="mt-1 text-lg font-semibold"
             />
           </div>
