@@ -77,7 +77,7 @@ export default function RendasPage() {
               className="bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-600/20"
             >
               <Plus className="w-4 h-4 mr-2" />
-              Nova Renda ok
+              Nova Renda
             </Button>
           </motion.div>
 
