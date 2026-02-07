@@ -6,6 +6,7 @@ import { Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { expenseCategories, incomeCategories } from '../hooks/useLocalStorage';
 import { Transaction } from '@/types/finance';
+import { useTranslation } from '@/app/i18n/useTranslation';
 
 interface TransactionItemProps {
   transaction: Transaction;
@@ -14,10 +15,11 @@ interface TransactionItemProps {
 }
 
 export default function TransactionItem({ transaction, onDelete, index }: TransactionItemProps) {
+  const { t, formatCurrency, formatDate, formatTime } = useTranslation();
   const isExpense = transaction.type === 'expense';
   const templates = isExpense ? expenseCategories : incomeCategories;
   const template =
-    templates.find((t) => t.name === transaction.category) || templates[templates.length - 1];
+    templates.find((c) => c.key === transaction.category) || templates[templates.length - 1];
 
   return (
     <motion.div
@@ -35,21 +37,16 @@ export default function TransactionItem({ transaction, onDelete, index }: Transa
         </div>
         <div>
           <p className="font-semibold text-gray-900">
-            {transaction.description || transaction.category}
+            {transaction.description || t(`categories.${transaction.type === 'expense' ? 'expense' : 'income'}.${transaction.category}`)}
           </p>
           <p className="text-sm text-gray-500">
-            {transaction.category} • {new Date(transaction.date).toLocaleDateString('pt-BR')} às{' '}
-            {new Date(transaction.date).toLocaleTimeString('pt-BR', {
-              hour: '2-digit',
-              minute: '2-digit',
-            })}
+            {t(`categories.${transaction.type === 'expense' ? 'expense' : 'income'}.${transaction.category}`)} • {formatDate(transaction.date)} {t('transaction.at')} {formatTime(transaction.date)}
           </p>
         </div>
       </div>
       <div className="flex items-center gap-4">
         <p className={`text-lg font-bold ${isExpense ? 'text-rose-600' : 'text-emerald-600'}`}>
-          {isExpense ? '-' : '+'} R${' '}
-          {transaction.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          {isExpense ? '- ' : '+ '}{formatCurrency(transaction.amount)}
         </p>
         <Button
           variant="ghost"

@@ -28,7 +28,7 @@ export interface RendimentoData {
 }
 
 export interface Template {
-  name: string;
+  key: string;
   icon: string;
   color: string;
 }

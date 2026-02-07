@@ -20,6 +20,7 @@ import CategoryBreakdown from '../app/components/charts/CategoryBreakdown';
 import { calcularRendimento } from '../app/components/finance/InvestmentCard';
 import { Transaction, Investment } from '@/types/finance';
 import AppLayout from '../app/components/layout/AppLayout';
+import { useTranslation } from '@/app/i18n/useTranslation';
 
 export default function DashboardPage() {
   const [transactions, setTransactions] = useLocalStorage<Transaction[]>(
@@ -30,6 +31,7 @@ export default function DashboardPage() {
   const [showExpenseForm, setShowExpenseForm] = useState(false);
   const [showIncomeForm, setShowIncomeForm] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState('month');
+  const { t, formatCurrency } = useTranslation();
 
   const getFilteredTransactions = () => {
     const now = new Date();
@@ -50,8 +52,8 @@ export default function DashboardPage() {
       all: () => true,
     };
 
-    return transactions.filter((t) => {
-      const date = new Date(t.date);
+    return transactions.filter((tx) => {
+      const date = new Date(tx.date);
       const filterFn = filters[selectedPeriod] || filters.all;
       return filterFn(date);
     });
@@ -60,12 +62,12 @@ export default function DashboardPage() {
   const filteredTransactions = getFilteredTransactions();
 
   const totalIncome = filteredTransactions
-    .filter((t) => t.type === 'income')
-    .reduce((sum, t) => sum + t.amount, 0);
+    .filter((tx) => tx.type === 'income')
+    .reduce((sum, tx) => sum + tx.amount, 0);
 
   const totalExpenses = filteredTransactions
-    .filter((t) => t.type === 'expense')
-    .reduce((sum, t) => sum + t.amount, 0);
+    .filter((tx) => tx.type === 'expense')
+    .reduce((sum, tx) => sum + tx.amount, 0);
 
   const balance = totalIncome - totalExpenses;
 
@@ -78,7 +80,7 @@ export default function DashboardPage() {
   };
 
   const handleDeleteTransaction = (id: number) => {
-    setTransactions(transactions.filter((t) => t.id !== id));
+    setTransactions(transactions.filter((tx) => tx.id !== id));
   };
 
   const rendimentoDiarioTotal = investments.reduce((sum, inv) => {
@@ -86,23 +88,16 @@ export default function DashboardPage() {
     return sum + dados.rendimentoDiario;
   }, 0);
 
-  const formatCurrency = (value: number) => {
-    return `R$ ${value.toLocaleString('pt-BR', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })}`;
-  };
-
   const periods = [
-    { value: 'month', label: 'Este Mês' },
-    { value: '3months', label: 'Últimos 3 Meses' },
-    { value: '6months', label: 'Últimos 6 Meses' },
-    { value: 'year', label: 'Este Ano' },
-    { value: 'all', label: 'Tudo' },
+    { value: 'month', label: t('periods.month') },
+    { value: '3months', label: t('periods.3months') },
+    { value: '6months', label: t('periods.6months') },
+    { value: 'year', label: t('periods.year') },
+    { value: 'all', label: t('periods.all') },
   ];
 
   return (
-    <AppLayout currentPageName="Dashboard">
+    <AppLayout>
       <div className="min-h-screen bg-gray-50/50 p-6 lg:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           <motion.div
@@ -111,8 +106,8 @@ export default function DashboardPage() {
             className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
           >
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-              <p className="text-gray-500 mt-1">Visão geral das suas finanças</p>
+              <h1 className="text-3xl font-bold text-gray-900">{t('dashboard.title')}</h1>
+              <p className="text-gray-500 mt-1">{t('dashboard.subtitle')}</p>
             </div>
             <div className="flex gap-3">
               <Button
@@ -120,14 +115,14 @@ export default function DashboardPage() {
                 className="bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-600/20"
               >
                 <ArrowUpRight className="w-4 h-4 mr-2" />
-                Nova Renda
+                {t('dashboard.newIncome')}
               </Button>
               <Button
                 onClick={() => setShowExpenseForm(true)}
                 className="bg-rose-600 hover:bg-rose-700 shadow-lg shadow-rose-600/20"
               >
                 <ArrowDownRight className="w-4 h-4 mr-2" />
-                Novo Gasto
+                {t('dashboard.newExpense')}
               </Button>
             </div>
           </motion.div>
@@ -138,7 +133,7 @@ export default function DashboardPage() {
             transition={{ delay: 0.1 }}
             className="flex items-center gap-3"
           >
-            <span className="text-sm font-medium text-gray-600">Período:</span>
+            <span className="text-sm font-medium text-gray-600">{t('dashboard.period')}</span>
             <div className="flex gap-2 flex-wrap">
               {periods.map((period) => (
                 <button
@@ -158,32 +153,32 @@ export default function DashboardPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <StatCard
-              title="Saldo Atual"
+              title={t('dashboard.currentBalance')}
               value={formatCurrency(balance)}
               icon={Wallet}
               color={balance >= 0 ? 'blue' : 'red'}
               delay={0}
             />
             <StatCard
-              title="Total de Receitas"
+              title={t('dashboard.totalIncome')}
               value={formatCurrency(totalIncome)}
               icon={TrendingUp}
               color="green"
               delay={0.1}
             />
             <StatCard
-              title="Total de Gastos"
+              title={t('dashboard.totalExpenses')}
               value={formatCurrency(totalExpenses)}
               icon={TrendingDown}
               color="red"
               delay={0.2}
             />
             <StatCard
-              title="Rendimento/Dia"
+              title={t('dashboard.dailyYield')}
               value={formatCurrency(rendimentoDiarioTotal)}
               icon={PiggyBank}
               color="purple"
-              trend={`${formatCurrency(rendimentoDiarioTotal * 30)}/mês`}
+              trend={`${formatCurrency(rendimentoDiarioTotal * 30)}${t('dashboard.perMonth')}`}
               trendUp={true}
               delay={0.3}
             />
@@ -205,13 +200,15 @@ export default function DashboardPage() {
             className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm"
           >
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-bold text-gray-900">Transações Recentes</h3>
+              <h3 className="text-lg font-bold text-gray-900">
+                {t('dashboard.recentTransactions')}
+              </h3>
             </div>
             {recentTransactions.length === 0 ? (
               <div className="text-center py-12 text-gray-400">
                 <Wallet className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p>Nenhuma transação ainda</p>
-                <p className="text-sm mt-1">Clique nos botões acima para adicionar</p>
+                <p>{t('dashboard.noTransactions')}</p>
+                <p className="text-sm mt-1">{t('dashboard.clickToAdd')}</p>
               </div>
             ) : (
               <div className="space-y-3">

@@ -1,0 +1,160 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "income": "Rendas",
+    "expenses": "Gastos",
+    "investments": "Investimentos",
+    "settings": "Configurações",
+    "personalFinance": "Finanças Pessoais"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Visão geral das suas finanças",
+    "newIncome": "Nova Renda",
+    "newExpense": "Novo Gasto",
+    "period": "Período:",
+    "currentBalance": "Saldo Atual",
+    "totalIncome": "Total de Rendas",
+    "totalExpenses": "Total de Gastos",
+    "dailyYield": "Rendimento Diário",
+    "perMonth": "/mês",
+    "recentTransactions": "Transações Recentes",
+    "noTransactions": "Nenhuma transação ainda",
+    "clickToAdd": "Clique nos botões acima para adicionar"
+  },
+  "periods": {
+    "month": "Este Mês",
+    "3months": "Últimos 3 Meses",
+    "6months": "Últimos 6 Meses",
+    "year": "Este Ano",
+    "all": "Tudo"
+  },
+  "months": {
+    "all": "Todos os meses",
+    "allShort": "Todos",
+    "0": "Janeiro",
+    "1": "Fevereiro",
+    "2": "Março",
+    "3": "Abril",
+    "4": "Maio",
+    "5": "Junho",
+    "6": "Julho",
+    "7": "Agosto",
+    "8": "Setembro",
+    "9": "Outubro",
+    "10": "Novembro",
+    "11": "Dezembro"
+  },
+  "expenses": {
+    "title": "Gastos",
+    "subtitle": "Acompanhe seus gastos",
+    "newExpense": "Novo Gasto",
+    "totalExpenses": "Total de Gastos",
+    "quickAdd": "Adição Rápida",
+    "history": "Histórico de Gastos",
+    "noExpenses": "Nenhum gasto registrado",
+    "clickToAdd": "Clique em \"Novo Gasto\" para adicionar",
+    "allCategories": "Todas as categorias",
+    "byCategory": "Gastos por Categoria",
+    "addToSeeChart": "Adicione gastos para ver o gráfico",
+    "transactions": "transações"
+  },
+  "income": {
+    "title": "Rendas",
+    "subtitle": "Gerencie suas fontes de renda",
+    "newIncome": "Nova Renda",
+    "totalIncome": "Total de Rendas",
+    "history": "Histórico de Rendas",
+    "noIncome": "Nenhuma renda registrada",
+    "clickToAdd": "Clique em \"Nova Renda\" para adicionar",
+    "transactions": "transações"
+  },
+  "investments": {
+    "title": "Investimentos",
+    "subtitle": "Acompanhe seus rendimentos",
+    "newInvestment": "Novo Investimento",
+    "editInvestment": "Editar Investimento",
+    "howItWorks": "Como funciona o cálculo?",
+    "howItWorksDesc": "Os rendimentos são calculados com base na taxa CDI atual (~13,65% a.a.) multiplicada pela porcentagem do seu investimento. O imposto de renda é descontado automaticamente seguindo a tabela regressiva: 22,5% (até 180 dias), 20% (181-360), 17,5% (361-720) e 15% (acima de 720 dias).",
+    "totalInvested": "Total Investido",
+    "netYield": "Rendimento Líquido",
+    "totalBalance": "Saldo Total",
+    "dailyYield": "Rendimento Diário",
+    "noInvestments": "Nenhum investimento registrado",
+    "addToTrack": "Adicione seus investimentos para acompanhar rendimentos",
+    "addFirst": "Adicionar Primeiro Investimento",
+    "confirmDelete": "Tem certeza que deseja excluir este investimento?",
+    "daysInvested": "dias investidos",
+    "investedAmount": "Valor Investido",
+    "currentBalance": "Saldo Atual",
+    "dailyReturn": "Retorno diário",
+    "grossReturn": "Retorno bruto",
+    "netReturn": "Retorno líquido",
+    "perMonth": "/mês"
+  },
+  "forms": {
+    "newExpense": "Novo Gasto",
+    "newIncome": "Nova Renda",
+    "category": "Categoria",
+    "amount": "Valor",
+    "description": "Descrição (opcional)",
+    "descriptionPlaceholder": "ex. Almoço no restaurante",
+    "date": "Data",
+    "time": "Hora",
+    "addExpense": "Adicionar Gasto",
+    "addIncome": "Adicionar Renda",
+    "investmentName": "Nome do Investimento",
+    "investmentNamePlaceholder": "ex. Tesouro Direto, CDB",
+    "investedValue": "Valor Investido",
+    "cdiPercentage": "Porcentagem do CDI (%)",
+    "cdiExample": "ex. 100% CDI, 102% CDI, 110% CDI",
+    "startDate": "Data de Início",
+    "cancel": "Cancelar",
+    "update": "Atualizar",
+    "add": "Adicionar"
+  },
+  "charts": {
+    "summary": "Resumo",
+    "addTransactions": "Adicione transações",
+    "income": "Rendas",
+    "expenses": "Gastos",
+    "balance": "Saldo",
+    "categories": "categorias",
+    "total": "Total:"
+  },
+  "transaction": {
+    "at": "às"
+  },
+  "categories": {
+    "expense": {
+      "food": "Alimentação",
+      "transport": "Transporte",
+      "housing": "Moradia",
+      "health": "Saúde",
+      "leisure": "Lazer",
+      "education": "Educação",
+      "shopping": "Compras",
+      "streaming": "Streaming",
+      "internet": "Internet",
+      "phone": "Celular",
+      "subscriptions": "Assinaturas",
+      "other": "Outros"
+    },
+    "income": {
+      "salary": "Salário",
+      "freelance": "Freelance",
+      "investments": "Investimentos",
+      "rent": "Aluguel",
+      "other": "Outros"
+    }
+  },
+  "settings": {
+    "title": "Configurações",
+    "language": "Idioma",
+    "currency": "Moeda",
+    "ratesUpdated": "Taxas atualizadas em",
+    "ratesError": "Erro ao carregar taxas",
+    "refreshRates": "Atualizar taxas",
+    "loading": "Carregando..."
+  }
+}

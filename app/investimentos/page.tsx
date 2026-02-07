@@ -9,8 +9,10 @@ import InvestmentCard, { calcularRendimento } from '../components/finance/Invest
 import InvestmentForm from '../components/forms/InvestmentForm';
 import AppLayout from '../components/layout/AppLayout';
 import { Investment } from '@/types/finance';
+import { useTranslation } from '@/app/i18n/useTranslation';
 
 export default function InvestimentosPage() {
+  const { t, formatCurrency } = useTranslation();
   const [investments, setInvestments] = useLocalStorage<Investment[]>('finance_investments', []);
   const [showForm, setShowForm] = useState(false);
   const [editingInvestment, setEditingInvestment] = useState<Investment | null>(null);
@@ -25,7 +27,7 @@ export default function InvestimentosPage() {
   };
 
   const handleDelete = (id: number) => {
-    if (confirm('Deseja realmente excluir este investimento?')) {
+    if (confirm(t('investments.confirmDelete'))) {
       setInvestments(investments.filter((inv) => inv.id !== id));
     }
   };
@@ -47,7 +49,7 @@ export default function InvestimentosPage() {
   }, 0);
 
   return (
-    <AppLayout currentPageName="Investimentos">
+    <AppLayout>
       <div className="min-h-screen bg-gray-50/50 p-6 lg:p-8">
         <div className="max-w-6xl mx-auto space-y-8">
           <motion.div
@@ -56,8 +58,8 @@ export default function InvestimentosPage() {
             className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
           >
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Investimentos</h1>
-              <p className="text-gray-500 mt-1">Acompanhe seus rendimentos</p>
+              <h1 className="text-3xl font-bold text-gray-900">{t('investments.title')}</h1>
+              <p className="text-gray-500 mt-1">{t('investments.subtitle')}</p>
             </div>
             <Button
               onClick={() => {
@@ -67,7 +69,7 @@ export default function InvestimentosPage() {
               className="bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/20"
             >
               <Plus className="w-4 h-4 mr-2" />
-              Novo Investimento
+              {t('investments.newInvestment')}
             </Button>
           </motion.div>
 
@@ -79,13 +81,8 @@ export default function InvestimentosPage() {
           >
             <Info className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
             <div className="text-sm text-blue-900">
-              <p className="font-medium mb-1">Como funciona o cálculo?</p>
-              <p className="text-blue-700">
-                O rendimento é calculado com base no CDI atual (~13.65% a.a.) multiplicado pelo
-                percentual do seu investimento. O IR é descontado automaticamente seguindo a tabela
-                regressiva: 22.5% (até 180 dias), 20% (181-360), 17.5% (361-720) e 15% (acima de 720
-                dias).
-              </p>
+              <p className="font-medium mb-1">{t('investments.howItWorks')}</p>
+              <p className="text-blue-700">{t('investments.howItWorksDesc')}</p>
             </div>
           </motion.div>
 
@@ -98,15 +95,9 @@ export default function InvestimentosPage() {
             >
               <div className="flex items-center gap-2 mb-2">
                 <PiggyBank className="w-5 h-5" />
-                <span className="text-sm opacity-90">Total Investido</span>
+                <span className="text-sm opacity-90">{t('investments.totalInvested')}</span>
               </div>
-              <p className="text-3xl font-bold">
-                R${' '}
-                {totalInvestido.toLocaleString('pt-BR', {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-              </p>
+              <p className="text-3xl font-bold">{formatCurrency(totalInvestido)}</p>
             </motion.div>
 
             <motion.div
@@ -117,15 +108,9 @@ export default function InvestimentosPage() {
             >
               <div className="flex items-center gap-2 mb-2">
                 <TrendingUp className="w-5 h-5" />
-                <span className="text-sm opacity-90">Rendimento Líquido</span>
+                <span className="text-sm opacity-90">{t('investments.netYield')}</span>
               </div>
-              <p className="text-3xl font-bold">
-                R${' '}
-                {totalRendimentoLiquido.toLocaleString('pt-BR', {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-              </p>
+              <p className="text-3xl font-bold">{formatCurrency(totalRendimentoLiquido)}</p>
             </motion.div>
 
             <motion.div
@@ -136,15 +121,9 @@ export default function InvestimentosPage() {
             >
               <div className="flex items-center gap-2 mb-2">
                 <DollarSign className="w-5 h-5" />
-                <span className="text-sm opacity-90">Saldo Total</span>
+                <span className="text-sm opacity-90">{t('investments.totalBalance')}</span>
               </div>
-              <p className="text-3xl font-bold">
-                R${' '}
-                {totalSaldo.toLocaleString('pt-BR', {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-              </p>
+              <p className="text-3xl font-bold">{formatCurrency(totalSaldo)}</p>
             </motion.div>
 
             <motion.div
@@ -155,22 +134,12 @@ export default function InvestimentosPage() {
             >
               <div className="flex items-center gap-2 mb-2">
                 <TrendingUp className="w-5 h-5" />
-                <span className="text-sm opacity-90">Rendimento/Dia</span>
+                <span className="text-sm opacity-90">{t('investments.dailyYield')}</span>
               </div>
-              <p className="text-3xl font-bold">
-                R${' '}
-                {rendimentoDiarioTotal.toLocaleString('pt-BR', {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-              </p>
+              <p className="text-3xl font-bold">{formatCurrency(rendimentoDiarioTotal)}</p>
               <p className="text-xs opacity-75 mt-1">
-                ~R${' '}
-                {(rendimentoDiarioTotal * 30).toLocaleString('pt-BR', {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-                /mês
+                ~{formatCurrency(rendimentoDiarioTotal * 30)}
+                {t('investments.perMonth')}
               </p>
             </motion.div>
           </div>
@@ -184,14 +153,12 @@ export default function InvestimentosPage() {
               <div className="bg-white rounded-2xl p-12 text-center border border-gray-100">
                 <PiggyBank className="w-16 h-16 mx-auto mb-4 text-gray-300" />
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Nenhum investimento cadastrado
+                  {t('investments.noInvestments')}
                 </h3>
-                <p className="text-gray-500 mb-6">
-                  Adicione seus investimentos para acompanhar os rendimentos
-                </p>
+                <p className="text-gray-500 mb-6">{t('investments.addToTrack')}</p>
                 <Button onClick={() => setShowForm(true)} className="bg-blue-600 hover:bg-blue-700">
                   <Plus className="w-4 h-4 mr-2" />
-                  Adicionar Primeiro Investimento
+                  {t('investments.addFirst')}
                 </Button>
               </div>
             ) : (

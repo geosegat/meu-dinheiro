@@ -9,6 +9,7 @@ import TransactionItem from '../components/finance/TransactionItem';
 import QuickAddForm from '../components/forms/QuickAddForm';
 import AppLayout from '../components/layout/AppLayout';
 import { Transaction } from '@/types/finance';
+import { useTranslation } from '@/app/i18n/useTranslation';
 
 export default function GastosPage() {
   const [transactions, setTransactions] = useLocalStorage<Transaction[]>(
@@ -18,56 +19,57 @@ export default function GastosPage() {
   const [showForm, setShowForm] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState('all');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const { t, formatCurrency } = useTranslation();
 
   const expenseTransactions = transactions
-    .filter((t) => t.type === 'expense')
-    .filter((t) => {
+    .filter((tx) => tx.type === 'expense')
+    .filter((tx) => {
       if (selectedMonth === 'all') return true;
-      const date = new Date(t.date);
+      const date = new Date(tx.date);
       return date.getMonth() === parseInt(selectedMonth);
     })
-    .filter((t) => {
+    .filter((tx) => {
       if (selectedCategory === 'all') return true;
-      return t.category === selectedCategory;
+      return tx.category === selectedCategory;
     })
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-  const totalExpenses = expenseTransactions.reduce((sum, t) => sum + t.amount, 0);
+  const totalExpenses = expenseTransactions.reduce((sum, tx) => sum + tx.amount, 0);
 
   const handleAddTransaction = (transaction: Transaction) => {
     setTransactions([...transactions, transaction]);
   };
 
   const handleDeleteTransaction = (id: number) => {
-    setTransactions(transactions.filter((t) => t.id !== id));
+    setTransactions(transactions.filter((tx) => tx.id !== id));
   };
 
   const months = [
-    { value: 'all', label: 'Todos os meses' },
-    { value: '0', label: 'Janeiro' },
-    { value: '1', label: 'Fevereiro' },
-    { value: '2', label: 'Março' },
-    { value: '3', label: 'Abril' },
-    { value: '4', label: 'Maio' },
-    { value: '5', label: 'Junho' },
-    { value: '6', label: 'Julho' },
-    { value: '7', label: 'Agosto' },
-    { value: '8', label: 'Setembro' },
-    { value: '9', label: 'Outubro' },
-    { value: '10', label: 'Novembro' },
-    { value: '11', label: 'Dezembro' },
+    { value: 'all', label: t('months.all') },
+    { value: '0', label: t('months.0') },
+    { value: '1', label: t('months.1') },
+    { value: '2', label: t('months.2') },
+    { value: '3', label: t('months.3') },
+    { value: '4', label: t('months.4') },
+    { value: '5', label: t('months.5') },
+    { value: '6', label: t('months.6') },
+    { value: '7', label: t('months.7') },
+    { value: '8', label: t('months.8') },
+    { value: '9', label: t('months.9') },
+    { value: '10', label: t('months.10') },
+    { value: '11', label: t('months.11') },
   ];
 
   const byCategory = transactions
-    .filter((t) => t.type === 'expense')
-    .reduce((acc: Record<string, number>, t) => {
-      if (!acc[t.category]) acc[t.category] = 0;
-      acc[t.category] += t.amount;
+    .filter((tx) => tx.type === 'expense')
+    .reduce((acc: Record<string, number>, tx) => {
+      if (!acc[tx.category]) acc[tx.category] = 0;
+      acc[tx.category] += tx.amount;
       return acc;
     }, {});
 
   return (
-    <AppLayout currentPageName="Gastos">
+    <AppLayout>
       <div className="min-h-screen bg-gray-50/50 p-6 lg:p-8">
         <div className="max-w-5xl mx-auto space-y-8">
           <motion.div
@@ -76,15 +78,15 @@ export default function GastosPage() {
             className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
           >
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Gastos</h1>
-              <p className="text-gray-500 mt-1">Controle suas despesas</p>
+              <h1 className="text-3xl font-bold text-gray-900">{t('expenses.title')}</h1>
+              <p className="text-gray-500 mt-1">{t('expenses.subtitle')}</p>
             </div>
             <Button
               onClick={() => setShowForm(true)}
               className="bg-rose-600 hover:bg-rose-700 shadow-lg shadow-rose-600/20"
             >
               <Plus className="w-4 h-4 mr-2" />
-              Novo Gasto
+              {t('expenses.newExpense')}
             </Button>
           </motion.div>
 
@@ -98,12 +100,12 @@ export default function GastosPage() {
               <div className="p-2 bg-white/20 rounded-lg">
                 <TrendingDown className="w-5 h-5" />
               </div>
-              <span className="font-medium opacity-90">Total de Gastos</span>
+              <span className="font-medium opacity-90">{t('expenses.totalExpenses')}</span>
             </div>
-            <p className="text-4xl font-bold">
-              R$ {totalExpenses.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            <p className="text-4xl font-bold">{formatCurrency(totalExpenses)}</p>
+            <p className="text-sm opacity-75 mt-2">
+              {expenseTransactions.length} {t('expenses.transactions')}
             </p>
-            <p className="text-sm opacity-75 mt-2">{expenseTransactions.length} transações</p>
           </motion.div>
 
           <motion.div
@@ -112,11 +114,11 @@ export default function GastosPage() {
             transition={{ delay: 0.2 }}
             className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm"
           >
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Adicionar Rápido</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-4">{t('expenses.quickAdd')}</h3>
             <div className="grid grid-cols-4 md:grid-cols-6 gap-3">
               {expenseCategories.slice(0, 6).map((template) => (
                 <motion.button
-                  key={template.name}
+                  key={template.key}
                   type="button"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -124,7 +126,9 @@ export default function GastosPage() {
                   className="p-4 rounded-xl border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all text-center"
                 >
                   <div className="text-2xl mb-2">{template.icon}</div>
-                  <p className="text-xs font-medium text-gray-600 truncate">{template.name}</p>
+                  <p className="text-xs font-medium text-gray-600 truncate">
+                    {t(`categories.expense.${template.key}`)}
+                  </p>
                 </motion.button>
               ))}
             </div>
@@ -141,16 +145,17 @@ export default function GastosPage() {
                 .sort((a, b) => (b[1] as number) - (a[1] as number))
                 .slice(0, 4)
                 .map(([category, amount]) => {
-                  const template = expenseCategories.find((t) => t.name === category);
+                  const template = expenseCategories.find((c) => c.key === category);
                   return (
                     <div key={category} className="bg-white rounded-xl p-4 border border-gray-100">
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-xl">{template?.icon || '📦'}</span>
-                        <span className="text-sm font-medium text-gray-600">{category}</span>
+                        <span className="text-sm font-medium text-gray-600">
+                          {t(`categories.expense.${category}`)}
+                        </span>
                       </div>
                       <p className="text-lg font-bold text-gray-900">
-                        R${' '}
-                        {(amount as number).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        {formatCurrency(amount as number)}
                       </p>
                     </div>
                   );
@@ -180,10 +185,10 @@ export default function GastosPage() {
                 onChange={(e) => setSelectedCategory(e.target.value)}
                 className="px-4 py-2 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-rose-500"
               >
-                <option value="all">Todas categorias</option>
-                {expenseCategories.map((t) => (
-                  <option key={t.name} value={t.name}>
-                    {t.icon} {t.name}
+                <option value="all">{t('expenses.allCategories')}</option>
+                {expenseCategories.map((cat) => (
+                  <option key={cat.key} value={cat.key}>
+                    {cat.icon} {t(`categories.expense.${cat.key}`)}
                   </option>
                 ))}
               </select>
@@ -196,12 +201,12 @@ export default function GastosPage() {
             transition={{ delay: 0.3 }}
             className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm"
           >
-            <h3 className="text-lg font-bold text-gray-900 mb-6">Histórico de Gastos</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-6">{t('expenses.history')}</h3>
             {expenseTransactions.length === 0 ? (
               <div className="text-center py-12 text-gray-400">
                 <TrendingDown className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p>Nenhum gasto cadastrado</p>
-                <p className="text-sm mt-1">Clique em &quot;Novo Gasto&quot; para adicionar</p>
+                <p>{t('expenses.noExpenses')}</p>
+                <p className="text-sm mt-1">{t('expenses.clickToAdd')}</p>
               </div>
             ) : (
               <div className="space-y-3">

@@ -28,24 +28,44 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
 }
 
 export const expenseCategories = [
-  { name: 'Alimentação', icon: '🍔', color: 'bg-orange-100 text-orange-700' },
-  { name: 'Transporte', icon: '🚗', color: 'bg-blue-100 text-blue-700' },
-  { name: 'Moradia', icon: '🏠', color: 'bg-purple-100 text-purple-700' },
-  { name: 'Saúde', icon: '💊', color: 'bg-red-100 text-red-700' },
-  { name: 'Lazer', icon: '🎮', color: 'bg-pink-100 text-pink-700' },
-  { name: 'Educação', icon: '📚', color: 'bg-indigo-100 text-indigo-700' },
-  { name: 'Compras', icon: '🛒', color: 'bg-yellow-100 text-yellow-700' },
-  { name: 'Streaming', icon: '📺', color: 'bg-teal-100 text-teal-700' },
-  { name: 'Internet', icon: '📶', color: 'bg-cyan-100 text-cyan-700' },
-  { name: 'Celular', icon: '📱', color: 'bg-emerald-100 text-emerald-700' },
-  { name: 'Assinaturas', icon: '💳', color: 'bg-violet-100 text-violet-700' },
-  { name: 'Outros', icon: '📦', color: 'bg-gray-100 text-gray-700' },
+  { key: 'food', icon: '🍔', color: 'bg-orange-100 text-orange-700' },
+  { key: 'transport', icon: '🚗', color: 'bg-blue-100 text-blue-700' },
+  { key: 'housing', icon: '🏠', color: 'bg-purple-100 text-purple-700' },
+  { key: 'health', icon: '💊', color: 'bg-red-100 text-red-700' },
+  { key: 'leisure', icon: '🎮', color: 'bg-pink-100 text-pink-700' },
+  { key: 'education', icon: '📚', color: 'bg-indigo-100 text-indigo-700' },
+  { key: 'shopping', icon: '🛒', color: 'bg-yellow-100 text-yellow-700' },
+  { key: 'streaming', icon: '📺', color: 'bg-teal-100 text-teal-700' },
+  { key: 'internet', icon: '📶', color: 'bg-cyan-100 text-cyan-700' },
+  { key: 'phone', icon: '📱', color: 'bg-emerald-100 text-emerald-700' },
+  { key: 'subscriptions', icon: '💳', color: 'bg-violet-100 text-violet-700' },
+  { key: 'other', icon: '📦', color: 'bg-gray-100 text-gray-700' },
 ];
 
 export const incomeCategories = [
-  { name: 'Salário', icon: '💰', color: 'bg-green-100 text-green-700' },
-  { name: 'Freelance', icon: '💻', color: 'bg-blue-100 text-blue-700' },
-  { name: 'Investimentos', icon: '📈', color: 'bg-emerald-100 text-emerald-700' },
-  { name: 'Aluguel', icon: '🏢', color: 'bg-purple-100 text-purple-700' },
-  { name: 'Outros', icon: '✨', color: 'bg-gray-100 text-gray-700' },
+  { key: 'salary', icon: '💰', color: 'bg-green-100 text-green-700' },
+  { key: 'freelance', icon: '💻', color: 'bg-blue-100 text-blue-700' },
+  { key: 'investments', icon: '📈', color: 'bg-emerald-100 text-emerald-700' },
+  { key: 'rent', icon: '🏢', color: 'bg-purple-100 text-purple-700' },
+  { key: 'other', icon: '✨', color: 'bg-gray-100 text-gray-700' },
 ];
+
+// Maps old PT category names to new keys for data migration
+export const LEGACY_CATEGORY_MAP: Record<string, string> = {
+  Alimentação: 'food',
+  Transporte: 'transport',
+  Moradia: 'housing',
+  Saúde: 'health',
+  Lazer: 'leisure',
+  Educação: 'education',
+  Compras: 'shopping',
+  Streaming: 'streaming',
+  Internet: 'internet',
+  Celular: 'phone',
+  Assinaturas: 'subscriptions',
+  Outros: 'other',
+  Salário: 'salary',
+  Freelance: 'freelance',
+  Investimentos: 'investments',
+  Aluguel: 'rent',
+};

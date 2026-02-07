@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { TrendingUp, Calendar, Trash2, Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Investment, RendimentoData } from '@/types/finance';
+import { useTranslation } from '@/app/i18n/useTranslation';
 
 const CDI_ANUAL = 13.65;
 
@@ -52,6 +53,7 @@ export default function InvestmentCard({
   onEdit,
   index,
 }: InvestmentCardProps) {
+  const { t, formatCurrency } = useTranslation();
   const dados = calcularRendimento(investment);
 
   return (
@@ -67,7 +69,9 @@ export default function InvestmentCard({
           <h3 className="text-lg font-bold text-gray-900 mb-1">{investment.nome}</h3>
           <div className="flex items-center gap-2 text-sm text-gray-500">
             <Calendar className="w-4 h-4" />
-            <span>{dados.diasDecorridos} dias investidos</span>
+            <span>
+              {dados.diasDecorridos} {t('investments.daysInvested')}
+            </span>
           </div>
         </div>
         <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -92,66 +96,38 @@ export default function InvestmentCard({
 
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div className="bg-blue-50 rounded-lg p-3">
-          <p className="text-xs text-blue-600 mb-1">Valor Investido</p>
+          <p className="text-xs text-blue-600 mb-1">{t('investments.investedAmount')}</p>
           <p className="text-lg font-bold text-blue-900">
-            R${' '}
-            {investment.valor_inicial.toLocaleString('pt-BR', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
+            {formatCurrency(investment.valor_inicial)}
           </p>
         </div>
         <div className="bg-emerald-50 rounded-lg p-3">
-          <p className="text-xs text-emerald-600 mb-1">Saldo Atual</p>
-          <p className="text-lg font-bold text-emerald-900">
-            R${' '}
-            {dados.saldoAtual.toLocaleString('pt-BR', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
-          </p>
+          <p className="text-xs text-emerald-600 mb-1">{t('investments.currentBalance')}</p>
+          <p className="text-lg font-bold text-emerald-900">{formatCurrency(dados.saldoAtual)}</p>
         </div>
       </div>
 
       <div className="space-y-2 p-3 bg-gray-50 rounded-lg">
         <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-600">Rendimento/dia</span>
+          <span className="text-gray-600">{t('investments.dailyReturn')}</span>
           <span className="font-semibold text-gray-900">
-            R${' '}
-            {dados.rendimentoDiario.toLocaleString('pt-BR', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
+            {formatCurrency(dados.rendimentoDiario)}
           </span>
         </div>
         <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-600">Rendimento bruto</span>
+          <span className="text-gray-600">{t('investments.grossReturn')}</span>
           <span className="font-semibold text-gray-900">
-            R${' '}
-            {dados.rendimentoBruto.toLocaleString('pt-BR', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
+            {formatCurrency(dados.rendimentoBruto)}
           </span>
         </div>
         <div className="flex items-center justify-between text-sm">
           <span className="text-gray-600">IR ({dados.aliquotaIR}%)</span>
-          <span className="font-semibold text-rose-600">
-            - R${' '}
-            {dados.ir.toLocaleString('pt-BR', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
-          </span>
+          <span className="font-semibold text-rose-600">- {formatCurrency(dados.ir)}</span>
         </div>
         <div className="flex items-center justify-between text-sm pt-2 border-t border-gray-200">
-          <span className="text-gray-700 font-medium">Rendimento líquido</span>
+          <span className="text-gray-700 font-medium">{t('investments.netReturn')}</span>
           <span className="font-bold text-emerald-600">
-            R${' '}
-            {dados.rendimentoLiquido.toLocaleString('pt-BR', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
+            {formatCurrency(dados.rendimentoLiquido)}
           </span>
         </div>
       </div>

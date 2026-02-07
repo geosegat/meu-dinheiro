@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { Transaction } from '@/types/finance';
 import { expenseCategories } from '../../components/hooks/useLocalStorage';
+import { useTranslation } from '@/app/i18n/useTranslation';
 
 const COLORS = [
   '#F43F5E',
@@ -29,6 +30,8 @@ interface ChartDataItem {
 }
 
 export default function CategoryBreakdown({ transactions }: CategoryBreakdownProps) {
+  const { t, formatCurrency } = useTranslation();
+
   const expenses = transactions.filter((t) => t.type === 'expense');
 
   const categoryData = expenses.reduce((acc: Record<string, number>, t) => {
@@ -53,9 +56,9 @@ export default function CategoryBreakdown({ transactions }: CategoryBreakdownPro
         transition={{ delay: 0.3 }}
         className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm"
       >
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Gastos por Categoria</h3>
+        <h3 className="text-lg font-bold text-gray-900 mb-4">{t('expenses.byCategory')}</h3>
         <div className="h-64 flex items-center justify-center text-gray-400">
-          <p>Adicione gastos para ver o gráfico</p>
+          <p>{t('expenses.addToSeeChart')}</p>
         </div>
       </motion.div>
     );
@@ -69,12 +72,10 @@ export default function CategoryBreakdown({ transactions }: CategoryBreakdownPro
       className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm"
     >
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-bold text-gray-900">Gastos por Categoria</h3>
+        <h3 className="text-lg font-bold text-gray-900">{t('expenses.byCategory')}</h3>
         <div className="text-sm text-gray-500">
-          Total:{' '}
-          <span className="font-bold text-gray-900">
-            R$ {total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-          </span>
+          {t('charts.total')}{' '}
+          <span className="font-bold text-gray-900">{formatCurrency(total)}</span>
         </div>
       </div>
       <div className="flex flex-col md:flex-row items-center gap-8">
@@ -95,9 +96,7 @@ export default function CategoryBreakdown({ transactions }: CategoryBreakdownPro
                 ))}
               </Pie>
               <Tooltip
-                formatter={(value) =>
-                  `R$ ${Number(value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
-                }
+                formatter={(value) => formatCurrency(Number(value))}
                 contentStyle={{
                   borderRadius: '12px',
                   border: 'none',
@@ -109,7 +108,7 @@ export default function CategoryBreakdown({ transactions }: CategoryBreakdownPro
         </div>
         <div className="flex-1 space-y-3 w-full">
           {chartData.map((item, index) => {
-            const template = expenseCategories.find((t) => t.name === item.name);
+            const template = expenseCategories.find((c) => c.key === item.name);
             const percentage = ((item.value / total) * 100).toFixed(1);
             return (
               <div
@@ -123,12 +122,14 @@ export default function CategoryBreakdown({ transactions }: CategoryBreakdownPro
                   />
                   <div className="flex items-center gap-2 flex-1 min-w-0">
                     <span className="text-lg">{template?.icon}</span>
-                    <span className="text-sm font-medium text-gray-700 truncate">{item.name}</span>
+                    <span className="text-sm font-medium text-gray-700 truncate">
+                      {t(`categories.expense.${item.name}`)}
+                    </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-4 shrink-0">
                   <span className="text-sm font-bold text-gray-900">
-                    R$ {item.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    {formatCurrency(item.value)}
                   </span>
                   <span className="text-sm font-medium text-gray-500 w-12 text-right">
                     {percentage}%

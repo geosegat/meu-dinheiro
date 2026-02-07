@@ -9,8 +9,10 @@ import TransactionItem from '../components/finance/TransactionItem';
 import QuickAddForm from '../components/forms/QuickAddForm';
 import AppLayout from '../components/layout/AppLayout';
 import { Transaction } from '@/types/finance';
+import { useTranslation } from '@/app/i18n/useTranslation';
 
 export default function RendasPage() {
+  const { t, formatCurrency } = useTranslation();
   const [transactions, setTransactions] = useLocalStorage<Transaction[]>(
     'finance_transactions',
     []
@@ -38,19 +40,19 @@ export default function RendasPage() {
   };
 
   const months = [
-    { value: 'all', label: 'Todos' },
-    { value: '0', label: 'Janeiro' },
-    { value: '1', label: 'Fevereiro' },
-    { value: '2', label: 'Março' },
-    { value: '3', label: 'Abril' },
-    { value: '4', label: 'Maio' },
-    { value: '5', label: 'Junho' },
-    { value: '6', label: 'Julho' },
-    { value: '7', label: 'Agosto' },
-    { value: '8', label: 'Setembro' },
-    { value: '9', label: 'Outubro' },
-    { value: '10', label: 'Novembro' },
-    { value: '11', label: 'Dezembro' },
+    { value: 'all', label: t('months.allShort') },
+    { value: '0', label: t('months.0') },
+    { value: '1', label: t('months.1') },
+    { value: '2', label: t('months.2') },
+    { value: '3', label: t('months.3') },
+    { value: '4', label: t('months.4') },
+    { value: '5', label: t('months.5') },
+    { value: '6', label: t('months.6') },
+    { value: '7', label: t('months.7') },
+    { value: '8', label: t('months.8') },
+    { value: '9', label: t('months.9') },
+    { value: '10', label: t('months.10') },
+    { value: '11', label: t('months.11') },
   ];
 
   const byCategory = incomeTransactions.reduce((acc: Record<string, number>, t) => {
@@ -60,7 +62,7 @@ export default function RendasPage() {
   }, {});
 
   return (
-    <AppLayout currentPageName="Rendas">
+    <AppLayout>
       <div className="min-h-screen bg-gray-50/50 p-6 lg:p-8">
         <div className="max-w-5xl mx-auto space-y-8">
           <motion.div
@@ -69,15 +71,15 @@ export default function RendasPage() {
             className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
           >
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Rendas</h1>
-              <p className="text-gray-500 mt-1">Gerencie suas fontes de receita</p>
+              <h1 className="text-3xl font-bold text-gray-900">{t('income.title')}</h1>
+              <p className="text-gray-500 mt-1">{t('income.subtitle')}</p>
             </div>
             <Button
               onClick={() => setShowForm(true)}
               className="bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-600/20"
             >
               <Plus className="w-4 h-4 mr-2" />
-              Nova Renda
+              {t('income.newIncome')}
             </Button>
           </motion.div>
 
@@ -91,12 +93,12 @@ export default function RendasPage() {
               <div className="p-2 bg-white/20 rounded-lg">
                 <TrendingUp className="w-5 h-5" />
               </div>
-              <span className="font-medium opacity-90">Total de Receitas</span>
+              <span className="font-medium opacity-90">{t('income.totalIncome')}</span>
             </div>
-            <p className="text-4xl font-bold">
-              R$ {totalIncome.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            <p className="text-4xl font-bold">{formatCurrency(totalIncome)}</p>
+            <p className="text-sm opacity-75 mt-2">
+              {incomeTransactions.length} {t('income.transactions')}
             </p>
-            <p className="text-sm opacity-75 mt-2">{incomeTransactions.length} transações</p>
           </motion.div>
 
           {Object.keys(byCategory).length > 0 && (
@@ -107,15 +109,17 @@ export default function RendasPage() {
               className="grid grid-cols-2 md:grid-cols-4 gap-4"
             >
               {Object.entries(byCategory).map(([category, amount]) => {
-                const template = incomeCategories.find((t) => t.name === category);
+                const template = incomeCategories.find((c) => c.key === category);
                 return (
                   <div key={category} className="bg-white rounded-xl p-4 border border-gray-100">
                     <div className="flex items-center gap-2 mb-2">
                       <span className="text-xl">{template?.icon || '💰'}</span>
-                      <span className="text-sm font-medium text-gray-600">{category}</span>
+                      <span className="text-sm font-medium text-gray-600">
+                        {t(`categories.income.${category}`)}
+                      </span>
                     </div>
                     <p className="text-lg font-bold text-gray-900">
-                      R$ {(amount as number).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                      {formatCurrency(amount as number)}
                     </p>
                   </div>
                 );
@@ -144,12 +148,12 @@ export default function RendasPage() {
             transition={{ delay: 0.3 }}
             className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm"
           >
-            <h3 className="text-lg font-bold text-gray-900 mb-6">Histórico de Receitas</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-6">{t('income.history')}</h3>
             {incomeTransactions.length === 0 ? (
               <div className="text-center py-12 text-gray-400">
                 <TrendingUp className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p>Nenhuma receita cadastrada</p>
-                <p className="text-sm mt-1">Clique em &quot;Nova Renda&quot; para adicionar</p>
+                <p>{t('income.noIncome')}</p>
+                <p className="text-sm mt-1">{t('income.clickToAdd')}</p>
               </div>
             ) : (
               <div className="space-y-3">

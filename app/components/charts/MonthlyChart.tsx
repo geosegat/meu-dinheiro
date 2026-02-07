@@ -4,12 +4,15 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, TrendingDown, Wallet } from 'lucide-react';
 import { Transaction } from '@/types/finance';
+import { useTranslation } from '@/app/i18n/useTranslation';
 
 interface MonthlyChartProps {
   transactions: Transaction[];
 }
 
 export default function MonthlyChart({ transactions }: MonthlyChartProps) {
+  const { t, formatCurrency } = useTranslation();
+
   const expensesByCategory = transactions
     .filter((t) => t.type === 'expense')
     .reduce((acc: Record<string, number>, t) => {
@@ -36,9 +39,9 @@ export default function MonthlyChart({ transactions }: MonthlyChartProps) {
         animate={{ opacity: 1, y: 0 }}
         className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm h-full"
       >
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Resumo</h3>
+        <h3 className="text-lg font-bold text-gray-900 mb-4">{t('charts.summary')}</h3>
         <div className="h-64 flex items-center justify-center text-gray-400">
-          <p>Adicione transações</p>
+          <p>{t('charts.addTransactions')}</p>
         </div>
       </motion.div>
     );
@@ -51,33 +54,29 @@ export default function MonthlyChart({ transactions }: MonthlyChartProps) {
       transition={{ delay: 0.2 }}
       className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm h-full"
     >
-      <h3 className="text-lg font-bold text-gray-900 mb-6">Resumo</h3>
+      <h3 className="text-lg font-bold text-gray-900 mb-6">{t('charts.summary')}</h3>
 
       <div className="space-y-6">
         <div className="space-y-3">
           <div className="p-4 rounded-xl bg-linear-to-br from-emerald-50 to-teal-50 border border-emerald-100">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-sm font-medium text-emerald-700">Receitas</span>
+              <span className="text-sm font-medium text-emerald-700">{t('charts.income')}</span>
               <TrendingUp className="w-4 h-4 text-emerald-600" />
             </div>
-            <p className="text-2xl font-bold text-emerald-900">
-              R$ {totalIncome.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-            </p>
+            <p className="text-2xl font-bold text-emerald-900">{formatCurrency(totalIncome)}</p>
             <p className="text-xs text-emerald-600 mt-1">
-              {Object.keys(incomesByCategory).length} categorias
+              {Object.keys(incomesByCategory).length} {t('charts.categories')}
             </p>
           </div>
 
           <div className="p-4 rounded-xl bg-linear-to-br from-rose-50 to-red-50 border border-rose-100">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-sm font-medium text-rose-700">Gastos</span>
+              <span className="text-sm font-medium text-rose-700">{t('charts.expenses')}</span>
               <TrendingDown className="w-4 h-4 text-rose-600" />
             </div>
-            <p className="text-2xl font-bold text-rose-900">
-              R$ {totalExpenses.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-            </p>
+            <p className="text-2xl font-bold text-rose-900">{formatCurrency(totalExpenses)}</p>
             <p className="text-xs text-rose-600 mt-1">
-              {Object.keys(expensesByCategory).length} categorias
+              {Object.keys(expensesByCategory).length} {t('charts.categories')}
             </p>
           </div>
         </div>
@@ -90,7 +89,7 @@ export default function MonthlyChart({ transactions }: MonthlyChartProps) {
           }`}
         >
           <div className="flex items-center justify-between mb-1">
-            <span className="text-sm font-medium text-gray-700">Balanço</span>
+            <span className="text-sm font-medium text-gray-700">{t('charts.balance')}</span>
             <Wallet className="w-4 h-4 text-gray-600" />
           </div>
           <p
@@ -98,7 +97,7 @@ export default function MonthlyChart({ transactions }: MonthlyChartProps) {
               totalIncome - totalExpenses >= 0 ? 'text-blue-900' : 'text-orange-900'
             }`}
           >
-            R$ {(totalIncome - totalExpenses).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            {formatCurrency(totalIncome - totalExpenses)}
           </p>
         </div>
       </div>

@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { expenseCategories, incomeCategories } from '../hooks/useLocalStorage';
 import { Transaction, Template } from '@/types/finance';
+import { useTranslation } from '@/app/i18n/useTranslation';
 
 interface QuickAddFormProps {
   type: 'expense' | 'income';
@@ -17,6 +18,7 @@ interface QuickAddFormProps {
 }
 
 export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickAddFormProps) {
+  const { t, locale } = useTranslation();
   const [selectedCategory, setSelectedCategory] = useState<Template | null>(null);
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
@@ -30,7 +32,7 @@ export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickA
   const [time, setTime] = useState(currentTime);
 
   const templates = type === 'expense' ? expenseCategories : incomeCategories;
-  const title = type === 'expense' ? 'Novo Gasto' : 'Nova Renda';
+  const title = type === 'expense' ? t('forms.newExpense') : t('forms.newIncome');
 
   const handleSubmit = () => {
     if (!selectedCategory || !amount) return;
@@ -42,7 +44,7 @@ export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickA
     onAdd({
       id: Date.now(),
       type,
-      category: selectedCategory.name,
+      category: selectedCategory.key,
       amount: parseFloat(amount),
       description,
       date: selectedDateTime.toISOString(),
@@ -74,26 +76,29 @@ export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickA
     onOpenChange(false);
   };
 
+  const decimalSep = locale === 'pt-BR' ? ',' : '.';
+  const thousandsSep = locale === 'pt-BR' ? '.' : ',';
+
   const handleAmountChange = (value: string) => {
-    // Remove thousand separators (dots), keep only digits and comma
-    let raw = value.replace(/\./g, '').replace(/[^\d,]/g, '');
-    // Only allow one comma
-    const commaIndex = raw.indexOf(',');
-    if (commaIndex !== -1) {
-      raw = raw.slice(0, commaIndex + 1) + raw.slice(commaIndex + 1).replace(/,/g, '');
+    // Remove thousands separators, keep only digits and decimal separator
+    let raw = value.replace(new RegExp(`\\${thousandsSep}`, 'g'), '').replace(new RegExp(`[^\\d${decimalSep === ',' ? ',' : '.'}]`, 'g'), '');
+    // Only allow one decimal separator
+    const sepIndex = raw.indexOf(decimalSep);
+    if (sepIndex !== -1) {
+      raw = raw.slice(0, sepIndex + 1) + raw.slice(sepIndex + 1).replace(new RegExp(`\\${decimalSep}`, 'g'), '');
     }
     // Limit decimal to 2 places
-    const parts = raw.split(',');
+    const parts = raw.split(decimalSep);
     if (parts[1] && parts[1].length > 2) return;
     // Store with dot for parseFloat compatibility
-    setAmount(raw.replace(',', '.'));
+    setAmount(raw.replace(decimalSep, '.'));
   };
 
   const formatDisplayAmount = (value: string) => {
     if (!value) return '';
     const parts = value.split('.');
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-    return parts.join(',');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, thousandsSep);
+    return parts.join(decimalSep);
   };
 
   return (
@@ -105,34 +110,34 @@ export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickA
 
         <div className="space-y-6 pt-4">
           <div>
-            <p className="text-sm font-medium text-gray-700 mb-3">Categoria</p>
+            <p className="text-sm font-medium text-gray-700 mb-3">{t('forms.category')}</p>
             <div className="grid grid-cols-3 gap-2">
               {templates.map((template) => (
                 <motion.button
-                  key={template.name}
+                  key={template.key}
                   type="button"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setSelectedCategory(template)}
                   className={`p-3 rounded-xl border-2 transition-all ${
-                    selectedCategory?.name === template.name
+                    selectedCategory?.key === template.key
                       ? 'border-gray-900 bg-gray-50'
                       : 'border-gray-100 hover:border-gray-200'
                   }`}
                 >
                   <div className="text-2xl mb-1">{template.icon}</div>
-                  <p className="text-xs font-medium text-gray-700 truncate">{template.name}</p>
+                  <p className="text-xs font-medium text-gray-700 truncate">{t(`categories.${type}.${template.key}`)}</p>
                 </motion.button>
               ))}
             </div>
           </div>
 
           <div>
-            <p className="text-sm font-medium text-gray-700 mb-2">Valor (R$)</p>
+            <p className="text-sm font-medium text-gray-700 mb-2">{t('forms.amount')}</p>
             <Input
               type="text"
               inputMode="numeric"
-              placeholder="0,00"
+              placeholder={locale === 'pt-BR' ? '0,00' : '0.00'}
               value={formatDisplayAmount(amount)}
               onChange={(e) => handleAmountChange(e.target.value)}
               className="text-2xl font-bold h-14 text-center"
@@ -140,10 +145,10 @@ export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickA
           </div>
 
           <div>
-            <p className="text-sm font-medium text-gray-700 mb-2">Descrição (opcional)</p>
+            <p className="text-sm font-medium text-gray-700 mb-2">{t('forms.description')}</p>
             <Input
               type="text"
-              placeholder="Ex: Almoço no restaurante"
+              placeholder={t('forms.descriptionPlaceholder')}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
@@ -151,7 +156,7 @@ export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickA
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-2">Data</p>
+              <p className="text-sm font-medium text-gray-700 mb-2">{t('forms.date')}</p>
               <Input
                 type="date"
                 value={date}
@@ -161,7 +166,7 @@ export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickA
             </div>
 
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-2">Hora</p>
+              <p className="text-sm font-medium text-gray-700 mb-2">{t('forms.time')}</p>
               <Input
                 type="time"
                 value={time}
@@ -181,7 +186,7 @@ export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickA
             }`}
           >
             <Plus className="w-5 h-5 mr-2" />
-            Adicionar {type === 'expense' ? 'Gasto' : 'Renda'}
+            {t(type === 'expense' ? 'forms.addExpense' : 'forms.addIncome')}
           </Button>
         </div>
       </DialogContent>

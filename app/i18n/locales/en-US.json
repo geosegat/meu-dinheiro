@@ -1,0 +1,160 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "income": "Income",
+    "expenses": "Expenses",
+    "investments": "Investments",
+    "settings": "Settings",
+    "personalFinance": "Personal Finance"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Overview of your finances",
+    "newIncome": "New Income",
+    "newExpense": "New Expense",
+    "period": "Period:",
+    "currentBalance": "Current Balance",
+    "totalIncome": "Total Income",
+    "totalExpenses": "Total Expenses",
+    "dailyYield": "Daily Yield",
+    "perMonth": "/month",
+    "recentTransactions": "Recent Transactions",
+    "noTransactions": "No transactions yet",
+    "clickToAdd": "Click the buttons above to add"
+  },
+  "periods": {
+    "month": "This Month",
+    "3months": "Last 3 Months",
+    "6months": "Last 6 Months",
+    "year": "This Year",
+    "all": "All"
+  },
+  "months": {
+    "all": "All months",
+    "allShort": "All",
+    "0": "January",
+    "1": "February",
+    "2": "March",
+    "3": "April",
+    "4": "May",
+    "5": "June",
+    "6": "July",
+    "7": "August",
+    "8": "September",
+    "9": "October",
+    "10": "November",
+    "11": "December"
+  },
+  "expenses": {
+    "title": "Expenses",
+    "subtitle": "Track your spending",
+    "newExpense": "New Expense",
+    "totalExpenses": "Total Expenses",
+    "quickAdd": "Quick Add",
+    "history": "Expense History",
+    "noExpenses": "No expenses recorded",
+    "clickToAdd": "Click \"New Expense\" to add",
+    "allCategories": "All categories",
+    "byCategory": "Expenses by Category",
+    "addToSeeChart": "Add expenses to see the chart",
+    "transactions": "transactions"
+  },
+  "income": {
+    "title": "Income",
+    "subtitle": "Manage your income sources",
+    "newIncome": "New Income",
+    "totalIncome": "Total Income",
+    "history": "Income History",
+    "noIncome": "No income recorded",
+    "clickToAdd": "Click \"New Income\" to add",
+    "transactions": "transactions"
+  },
+  "investments": {
+    "title": "Investments",
+    "subtitle": "Track your returns",
+    "newInvestment": "New Investment",
+    "editInvestment": "Edit Investment",
+    "howItWorks": "How does the calculation work?",
+    "howItWorksDesc": "Returns are calculated based on the current CDI rate (~13.65% p.a.) multiplied by your investment's percentage. Income tax is automatically deducted following the regressive table: 22.5% (up to 180 days), 20% (181-360), 17.5% (361-720) and 15% (over 720 days).",
+    "totalInvested": "Total Invested",
+    "netYield": "Net Yield",
+    "totalBalance": "Total Balance",
+    "dailyYield": "Daily Yield",
+    "noInvestments": "No investments recorded",
+    "addToTrack": "Add your investments to track returns",
+    "addFirst": "Add First Investment",
+    "confirmDelete": "Are you sure you want to delete this investment?",
+    "daysInvested": "days invested",
+    "investedAmount": "Invested Amount",
+    "currentBalance": "Current Balance",
+    "dailyReturn": "Daily return",
+    "grossReturn": "Gross return",
+    "netReturn": "Net return",
+    "perMonth": "/month"
+  },
+  "forms": {
+    "newExpense": "New Expense",
+    "newIncome": "New Income",
+    "category": "Category",
+    "amount": "Amount",
+    "description": "Description (optional)",
+    "descriptionPlaceholder": "e.g. Lunch at restaurant",
+    "date": "Date",
+    "time": "Time",
+    "addExpense": "Add Expense",
+    "addIncome": "Add Income",
+    "investmentName": "Investment Name",
+    "investmentNamePlaceholder": "e.g. Treasury, Bank CD",
+    "investedValue": "Invested Amount",
+    "cdiPercentage": "CDI Percentage (%)",
+    "cdiExample": "e.g. 100% CDI, 102% CDI, 110% CDI",
+    "startDate": "Start Date",
+    "cancel": "Cancel",
+    "update": "Update",
+    "add": "Add"
+  },
+  "charts": {
+    "summary": "Summary",
+    "addTransactions": "Add transactions",
+    "income": "Income",
+    "expenses": "Expenses",
+    "balance": "Balance",
+    "categories": "categories",
+    "total": "Total:"
+  },
+  "transaction": {
+    "at": "at"
+  },
+  "categories": {
+    "expense": {
+      "food": "Food",
+      "transport": "Transportation",
+      "housing": "Housing",
+      "health": "Health",
+      "leisure": "Entertainment",
+      "education": "Education",
+      "shopping": "Shopping",
+      "streaming": "Streaming",
+      "internet": "Internet",
+      "phone": "Phone",
+      "subscriptions": "Subscriptions",
+      "other": "Other"
+    },
+    "income": {
+      "salary": "Salary",
+      "freelance": "Freelance",
+      "investments": "Investments",
+      "rent": "Rent",
+      "other": "Other"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "currency": "Currency",
+    "ratesUpdated": "Rates updated on",
+    "ratesError": "Failed to load rates",
+    "refreshRates": "Refresh rates",
+    "loading": "Loading..."
+  }
+}
