@@ -38,7 +38,11 @@ export default function TransactionItem({ transaction, onDelete, index }: Transa
             {transaction.description || transaction.category}
           </p>
           <p className="text-sm text-gray-500">
-            {transaction.category} • {new Date(transaction.date).toLocaleDateString('pt-BR')}
+            {transaction.category} • {new Date(transaction.date).toLocaleDateString('pt-BR')} às{' '}
+            {new Date(transaction.date).toLocaleTimeString('pt-BR', {
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
           </p>
         </div>
       </div>

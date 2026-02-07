@@ -73,16 +73,26 @@ export default function InvestmentForm({
     onOpenChange(false);
   };
 
-  const formatCurrencyInput = (value: string) => {
-    const numbers = value.replace(/\D/g, '');
-    if (!numbers) return '';
-    const amount = parseInt(numbers) / 100;
-    return amount.toFixed(2);
+  const handleValueChange = (value: string) => {
+    // Remove thousand separators (dots), keep only digits and comma
+    let raw = value.replace(/\./g, '').replace(/[^\d,]/g, '');
+    // Only allow one comma
+    const commaIndex = raw.indexOf(',');
+    if (commaIndex !== -1) {
+      raw = raw.slice(0, commaIndex + 1) + raw.slice(commaIndex + 1).replace(/,/g, '');
+    }
+    // Limit decimal to 2 places
+    const parts = raw.split(',');
+    if (parts[1] && parts[1].length > 2) return;
+    // Store with dot for parseFloat compatibility
+    setFormData({ ...formData, valor_inicial: raw.replace(',', '.') });
   };
 
-  const handleValueChange = (value: string) => {
-    const formatted = formatCurrencyInput(value);
-    setFormData({ ...formData, valor_inicial: formatted });
+  const formatDisplayAmount = (value: string) => {
+    if (!value) return '';
+    const parts = value.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return parts.join(',');
   };
 
   return (
@@ -119,7 +129,7 @@ export default function InvestmentForm({
               type="text"
               inputMode="numeric"
               placeholder="0,00"
-              value={formData.valor_inicial}
+              value={formatDisplayAmount(formData.valor_inicial)}
               onChange={(e) => handleValueChange(e.target.value)}
               className="mt-1 text-lg font-semibold"
             />

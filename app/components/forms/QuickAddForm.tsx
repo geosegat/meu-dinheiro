@@ -21,11 +21,23 @@ export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickA
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
 
+  // Initialize with current date and time
+  const now = new Date();
+  const currentDate = now.toISOString().split('T')[0]; // YYYY-MM-DD
+  const currentTime = now.toTimeString().slice(0, 5); // HH:MM
+
+  const [date, setDate] = useState(currentDate);
+  const [time, setTime] = useState(currentTime);
+
   const templates = type === 'expense' ? expenseCategories : incomeCategories;
   const title = type === 'expense' ? 'Novo Gasto' : 'Nova Renda';
 
   const handleSubmit = () => {
     if (!selectedCategory || !amount) return;
+
+    // Combine date and time into ISO string
+    const dateTimeString = `${date}T${time}:00`;
+    const selectedDateTime = new Date(dateTimeString);
 
     onAdd({
       id: Date.now(),
@@ -33,12 +45,19 @@ export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickA
       category: selectedCategory.name,
       amount: parseFloat(amount),
       description,
-      date: new Date().toISOString(),
+      date: selectedDateTime.toISOString(),
     });
 
+    // Reset form
     setSelectedCategory(null);
     setAmount('');
     setDescription('');
+
+    // Reset to current date/time
+    const resetNow = new Date();
+    setDate(resetNow.toISOString().split('T')[0]);
+    setTime(resetNow.toTimeString().slice(0, 5));
+
     onOpenChange(false);
   };
 
@@ -46,19 +65,35 @@ export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickA
     setSelectedCategory(null);
     setAmount('');
     setDescription('');
+
+    // Reset to current date/time
+    const resetNow = new Date();
+    setDate(resetNow.toISOString().split('T')[0]);
+    setTime(resetNow.toTimeString().slice(0, 5));
+
     onOpenChange(false);
   };
 
-  const formatCurrencyInput = (value: string) => {
-    const numbers = value.replace(/\D/g, '');
-    if (!numbers) return '';
-    const amount = parseInt(numbers) / 100;
-    return amount.toFixed(2);
+  const handleAmountChange = (value: string) => {
+    // Remove thousand separators (dots), keep only digits and comma
+    let raw = value.replace(/\./g, '').replace(/[^\d,]/g, '');
+    // Only allow one comma
+    const commaIndex = raw.indexOf(',');
+    if (commaIndex !== -1) {
+      raw = raw.slice(0, commaIndex + 1) + raw.slice(commaIndex + 1).replace(/,/g, '');
+    }
+    // Limit decimal to 2 places
+    const parts = raw.split(',');
+    if (parts[1] && parts[1].length > 2) return;
+    // Store with dot for parseFloat compatibility
+    setAmount(raw.replace(',', '.'));
   };
 
-  const handleAmountChange = (value: string) => {
-    const formatted = formatCurrencyInput(value);
-    setAmount(formatted);
+  const formatDisplayAmount = (value: string) => {
+    if (!value) return '';
+    const parts = value.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return parts.join(',');
   };
 
   return (
@@ -98,7 +133,7 @@ export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickA
               type="text"
               inputMode="numeric"
               placeholder="0,00"
-              value={amount}
+              value={formatDisplayAmount(amount)}
               onChange={(e) => handleAmountChange(e.target.value)}
               className="text-2xl font-bold h-14 text-center"
             />
@@ -112,6 +147,28 @@ export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickA
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm font-medium text-gray-700 mb-2">Data</p>
+              <Input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="h-12"
+              />
+            </div>
+
+            <div>
+              <p className="text-sm font-medium text-gray-700 mb-2">Hora</p>
+              <Input
+                type="time"
+                value={time}
+                onChange={(e) => setTime(e.target.value)}
+                className="h-12"
+              />
+            </div>
           </div>
 
           <Button
