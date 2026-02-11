@@ -88,7 +88,7 @@ export default function MonthlyChart({ transactions }: MonthlyChartProps) {
               </p>
               {futureIncome > 0 && (
                 <p className="text-xs text-emerald-500">
-                  +{formatCurrency(futureIncome)} {t('dashboard.future')}
+                  +{formatCurrency(futureIncome)} {t('dashboard.futureIncome')}
                 </p>
               )}
             </div>
@@ -106,7 +106,7 @@ export default function MonthlyChart({ transactions }: MonthlyChartProps) {
               </p>
               {futureExpenses > 0 && (
                 <p className="text-xs text-rose-500">
-                  {formatCurrency(futureExpenses)} {t('dashboard.future')}
+                  {formatCurrency(futureExpenses)} {t('dashboard.futureExpense')}
                 </p>
               )}
             </div>

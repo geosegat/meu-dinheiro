@@ -182,7 +182,9 @@ export default function DashboardPage() {
               icon={Wallet}
               color={currentBalance >= 0 ? 'blue' : 'red'}
               trend={futureIncome - futureExpenses !== 0 
-                ? `${futureIncome - futureExpenses >= 0 ? '+' : ''}${formatCurrency(futureIncome - futureExpenses)} ${t('dashboard.pending')}`
+                ? `${futureIncome - futureExpenses >= 0 ? '+' : ''}${formatCurrency(Math.abs(futureIncome - futureExpenses))} ${
+                    futureIncome - futureExpenses >= 0 ? t('dashboard.futureIncome') : t('dashboard.futureExpense')
+                  }`
                 : undefined}
               trendUp={futureIncome - futureExpenses >= 0}
               delay={0}
@@ -192,7 +194,7 @@ export default function DashboardPage() {
               value={formatCurrency(totalIncome)}
               icon={TrendingUp}
               color="green"
-              trend={futureIncome > 0 ? `${formatCurrency(futureIncome)} ${t('dashboard.future')}` : undefined}
+              trend={futureIncome > 0 ? `${formatCurrency(futureIncome)} ${t('dashboard.futureIncome')}` : undefined}
               trendUp={true}
               delay={0.1}
             />
@@ -201,7 +203,7 @@ export default function DashboardPage() {
               value={formatCurrency(totalExpenses)}
               icon={TrendingDown}
               color="red"
-              trend={futureExpenses > 0 ? `${formatCurrency(futureExpenses)} ${t('dashboard.future')}` : undefined}
+              trend={futureExpenses > 0 ? `${formatCurrency(futureExpenses)} ${t('dashboard.futureExpense')}` : undefined}
               trendUp={false}
               delay={0.2}
             />
