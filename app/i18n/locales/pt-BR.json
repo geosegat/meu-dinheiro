@@ -113,7 +113,8 @@
     "startDate": "Data de Início",
     "cancel": "Cancelar",
     "update": "Atualizar",
-    "add": "Adicionar"
+    "add": "Adicionar",
+    "save": "Salvar"
   },
   "charts": {
     "summary": "Resumo",
@@ -158,5 +159,58 @@
     "ratesError": "Erro ao carregar taxas",
     "refreshRates": "Atualizar taxas",
     "loading": "Carregando..."
+  },
+  "cards": {
+    "customize": "Personalizar Cards",
+    "customizeTitle": "Personalizar Dashboard",
+    "customizeSubtitle": "Escolha 4 cards para exibir",
+    "maxSelected": "Máximo de 4 cards selecionados",
+    "selectMore": "Selecione mais {{count}} card(s)",
+    "selectedCards": "Cards Selecionados",
+    "availableCards": "Cards Disponíveis",
+    "noCardsSelected": "Nenhum card selecionado ainda",
+    "dragToReorder": "Arraste para reordenar ou use as setas",
+    "save": "Salvar",
+    "currentBalance": {
+      "title": "Saldo Atual",
+      "description": "Seu saldo disponível agora"
+    },
+    "totalIncome": {
+      "title": "Total de Rendas",
+      "description": "Receitas do período selecionado"
+    },
+    "totalExpenses": {
+      "title": "Total de Gastos",
+      "description": "Despesas do período selecionado"
+    },
+    "monthlyExpenses": {
+      "title": "Gastos do Mês",
+      "description": "Comparação com o mês anterior"
+    },
+    "investments": {
+      "title": "Investimentos",
+      "description": "Saldo total dos investimentos",
+      "invested": "investido"
+    },
+    "topCategory": {
+      "title": "Maior Categoria",
+      "description": "Categoria com mais gastos",
+      "noData": "Sem dados"
+    },
+    "savingsRate": {
+      "title": "% Poupado",
+      "description": "Porcentagem da renda poupada",
+      "saved": "poupado"
+    },
+    "pendingPayments": {
+      "title": "Pendências",
+      "description": "Contas e gastos futuros",
+      "transactions": "pendências",
+      "noData": "Nenhuma pendência"
+    },
+    "dailyYield": {
+      "title": "Rendimento Diário",
+      "description": "Rendimento dos investimentos"
+    }
   }
 }

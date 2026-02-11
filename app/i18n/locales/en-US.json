@@ -113,7 +113,8 @@
     "startDate": "Start Date",
     "cancel": "Cancel",
     "update": "Update",
-    "add": "Add"
+    "add": "Add",
+    "save": "Save"
   },
   "charts": {
     "summary": "Summary",
@@ -158,5 +159,58 @@
     "ratesError": "Failed to load rates",
     "refreshRates": "Refresh rates",
     "loading": "Loading..."
+  },
+  "cards": {
+    "customize": "Customize Cards",
+    "customizeTitle": "Customize Dashboard",
+    "customizeSubtitle": "Choose 4 cards to display",
+    "maxSelected": "Maximum 4 cards selected",
+    "selectMore": "Select {{count}} more card(s)",
+    "selectedCards": "Selected Cards",
+    "availableCards": "Available Cards",
+    "noCardsSelected": "No cards selected yet",
+    "dragToReorder": "Drag to reorder or use arrows",
+    "save": "Save",
+    "currentBalance": {
+      "title": "Current Balance",
+      "description": "Your available balance now"
+    },
+    "totalIncome": {
+      "title": "Total Income",
+      "description": "Revenue for selected period"
+    },
+    "totalExpenses": {
+      "title": "Total Expenses",
+      "description": "Expenses for selected period"
+    },
+    "monthlyExpenses": {
+      "title": "Monthly Expenses",
+      "description": "Comparison with last month"
+    },
+    "investments": {
+      "title": "Investments",
+      "description": "Total investment balance",
+      "invested": "invested"
+    },
+    "topCategory": {
+      "title": "Top Category",
+      "description": "Category with most expenses",
+      "noData": "No data"
+    },
+    "savingsRate": {
+      "title": "Savings Rate",
+      "description": "Percentage of income saved",
+      "saved": "saved"
+    },
+    "pendingPayments": {
+      "title": "Pending",
+      "description": "Future bills and expenses",
+      "transactions": "pending",
+      "noData": "No pending"
+    },
+    "dailyYield": {
+      "title": "Daily Yield",
+      "description": "Investment returns"
+    }
   }
 }

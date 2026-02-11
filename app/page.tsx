@@ -1,26 +1,24 @@
 'use client';
 
-import  { useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   Wallet,
-  TrendingUp,
-  TrendingDown,
   ArrowUpRight,
   ArrowDownRight,
-  PiggyBank,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocalStorage } from '../app/components/hooks/useLocalStorage';
-import StatCard from '../app/components/layout/StatCard';
 import TransactionItem from '../app/components/finance/TransactionItem';
 import QuickAddForm from '../app/components/forms/QuickAddForm';
 import MonthlyChart from '../app/components/charts/MonthlyChart';
 import CategoryBreakdown from '../app/components/charts/CategoryBreakdown';
-import { calcularRendimento } from '../app/components/finance/InvestmentCard';
 import { Transaction, Investment } from '@/types/finance';
 import AppLayout from '../app/components/layout/AppLayout';
 import { useTranslation } from '@/app/i18n/useTranslation';
+import DynamicCard from '../app/components/dashboard/DynamicCard';
+import CardSelector from '../app/components/dashboard/CardSelector';
+import { DashboardCardConfig, DEFAULT_CARDS } from '@/app/types/dashboard';
 
 export default function DashboardPage() {
   const [transactions, setTransactions] = useLocalStorage<Transaction[]>(
@@ -28,10 +26,18 @@ export default function DashboardPage() {
     []
   );
   const [investments] = useLocalStorage<Investment[]>('finance_investments', []);
+  const [selectedCards, setSelectedCards] = useLocalStorage<DashboardCardConfig[]>(
+    'dashboard_cards',
+    DEFAULT_CARDS
+  );
   const [showExpenseForm, setShowExpenseForm] = useState(false);
   const [showIncomeForm, setShowIncomeForm] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState('month');
   const { t, formatCurrency } = useTranslation();
+
+  const handleSaveCards = (cards: DashboardCardConfig[]) => {
+    setSelectedCards(cards);
+  };
 
   const getFilteredTransactions = () => {
     const now = new Date();
@@ -107,11 +113,6 @@ export default function DashboardPage() {
     setTransactions(transactions.filter((tx) => tx.id !== id));
   };
 
-  const rendimentoDiarioTotal = investments.reduce((sum, inv) => {
-    const dados = calcularRendimento(inv);
-    return sum + dados.rendimentoDiario;
-  }, 0);
-
   const periods = [
     { value: 'month', label: t('periods.month') },
     { value: '3months', label: t('periods.3months') },
@@ -133,20 +134,23 @@ export default function DashboardPage() {
               <h1 className="text-3xl font-bold text-gray-900">{t('dashboard.title')}</h1>
               <p className="text-gray-500 mt-1">{t('dashboard.subtitle')}</p>
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-2 sm:gap-3">
+              <CardSelector selectedCards={selectedCards} onSave={handleSaveCards} />
               <Button
                 onClick={() => setShowIncomeForm(true)}
-                className="bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-600/20"
+                className="bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-600/20 flex-1 sm:flex-none"
               >
                 <ArrowUpRight className="w-4 h-4 mr-2" />
-                {t('dashboard.newIncome')}
+                <span className="hidden xs:inline">{t('dashboard.newIncome')}</span>
+                <span className="inline xs:hidden">Renda</span>
               </Button>
               <Button
                 onClick={() => setShowExpenseForm(true)}
-                className="bg-rose-600 hover:bg-rose-700 shadow-lg shadow-rose-600/20"
+                className="bg-rose-600 hover:bg-rose-700 shadow-lg shadow-rose-600/20 flex-1 sm:flex-none"
               >
                 <ArrowDownRight className="w-4 h-4 mr-2" />
-                {t('dashboard.newExpense')}
+                <span className="hidden xs:inline">{t('dashboard.newExpense')}</span>
+                <span className="inline xs:hidden">Gasto</span>
               </Button>
             </div>
           </motion.div>
@@ -176,46 +180,20 @@ export default function DashboardPage() {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <StatCard
-              title={t('dashboard.currentBalance')}
-              value={formatCurrency(currentBalance)}
-              icon={Wallet}
-              color={currentBalance >= 0 ? 'blue' : 'red'}
-              trend={futureIncome - futureExpenses !== 0 
-                ? `${futureIncome - futureExpenses >= 0 ? '+' : ''}${formatCurrency(Math.abs(futureIncome - futureExpenses))} ${
-                    futureIncome - futureExpenses >= 0 ? t('dashboard.futureIncome') : t('dashboard.futureExpense')
-                  }`
-                : undefined}
-              trendUp={futureIncome - futureExpenses >= 0}
-              delay={0}
-            />
-            <StatCard
-              title={t('dashboard.totalIncome')}
-              value={formatCurrency(totalIncome)}
-              icon={TrendingUp}
-              color="green"
-              trend={futureIncome > 0 ? `${formatCurrency(futureIncome)} ${t('dashboard.futureIncome')}` : undefined}
-              trendUp={true}
-              delay={0.1}
-            />
-            <StatCard
-              title={t('dashboard.totalExpenses')}
-              value={formatCurrency(totalExpenses)}
-              icon={TrendingDown}
-              color="red"
-              trend={futureExpenses > 0 ? `${formatCurrency(futureExpenses)} ${t('dashboard.futureExpense')}` : undefined}
-              trendUp={false}
-              delay={0.2}
-            />
-            <StatCard
-              title={t('dashboard.dailyYield')}
-              value={formatCurrency(rendimentoDiarioTotal)}
-              icon={PiggyBank}
-              color="purple"
-              trend={`${formatCurrency(rendimentoDiarioTotal * 30)}${t('dashboard.perMonth')}`}
-              trendUp={true}
-              delay={0.3}
-            />
+            {selectedCards
+              .sort((a, b) => a.order - b.order)
+              .map((card, index) => (
+                <DynamicCard
+                  key={card.id}
+                  type={card.type}
+                  transactions={filteredTransactions}
+                  investments={investments}
+                  currentBalance={currentBalance}
+                  futureIncome={futureIncome}
+                  futureExpenses={futureExpenses}
+                  delay={index * 0.1}
+                />
+              ))}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
