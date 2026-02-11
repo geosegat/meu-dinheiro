@@ -18,6 +18,8 @@
     "totalExpenses": "Total Expenses",
     "dailyYield": "Daily Yield",
     "perMonth": "/month",
+    "pending": "pending",
+    "future": "upcoming",
     "recentTransactions": "Recent Transactions",
     "noTransactions": "No transactions yet",
     "clickToAdd": "Click the buttons above to add"

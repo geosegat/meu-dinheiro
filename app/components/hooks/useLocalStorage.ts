@@ -1,16 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export function useLocalStorage<T>(key: string, initialValue: T) {
-  const [storedValue, setStoredValue] = useState<T>(() => {
-    try {
-      if (typeof window === 'undefined') return initialValue;
-      const item = window.localStorage.getItem(key);
-      return item ? JSON.parse(item) : initialValue;
-    } catch (error) {
-      console.log(error);
-      return initialValue;
-    }
-  });
+  const [storedValue, setStoredValue] = useState<T>(initialValue);
 
   const setValue = (value: T | ((prev: T) => T)) => {
     try {
@@ -23,6 +14,17 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    try {
+      const item = window.localStorage.getItem(key);
+      if (item) {
+        setStoredValue(JSON.parse(item));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }, [key]);
 
   return [storedValue, setValue] as const;
 }
@@ -50,7 +52,6 @@ export const incomeCategories = [
   { key: 'other', icon: '✨', color: 'bg-gray-100 text-gray-700' },
 ];
 
-// Maps old PT category names to new keys for data migration
 export const LEGACY_CATEGORY_MAP: Record<string, string> = {
   Alimentação: 'food',
   Transporte: 'transport',

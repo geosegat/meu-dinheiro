@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   Wallet,
@@ -61,6 +61,19 @@ export default function DashboardPage() {
 
   const filteredTransactions = getFilteredTransactions();
 
+  const now = new Date();
+  now.setHours(23, 59, 59, 999); 
+  
+  const pastTransactions = filteredTransactions.filter((tx) => {
+    const txDate = new Date(tx.date);
+    return txDate <= now;
+  });
+
+  const futureTransactions = filteredTransactions.filter((tx) => {
+    const txDate = new Date(tx.date);
+    return txDate > now;
+  });
+
   const totalIncome = filteredTransactions
     .filter((tx) => tx.type === 'income')
     .reduce((sum, tx) => sum + tx.amount, 0);
@@ -69,7 +82,18 @@ export default function DashboardPage() {
     .filter((tx) => tx.type === 'expense')
     .reduce((sum, tx) => sum + tx.amount, 0);
 
-  const balance = totalIncome - totalExpenses;
+  const futureIncome = futureTransactions
+    .filter((tx) => tx.type === 'income')
+    .reduce((sum, tx) => sum + tx.amount, 0);
+
+  const futureExpenses = futureTransactions
+    .filter((tx) => tx.type === 'expense')
+    .reduce((sum, tx) => sum + tx.amount, 0);
+
+  const currentBalance = pastTransactions.reduce((sum, tx) => {
+    return tx.type === 'income' ? sum + tx.amount : sum - tx.amount;
+  }, 0);
+
 
   const recentTransactions = [...transactions]
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
@@ -154,9 +178,13 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <StatCard
               title={t('dashboard.currentBalance')}
-              value={formatCurrency(balance)}
+              value={formatCurrency(currentBalance)}
               icon={Wallet}
-              color={balance >= 0 ? 'blue' : 'red'}
+              color={currentBalance >= 0 ? 'blue' : 'red'}
+              trend={futureIncome - futureExpenses !== 0 
+                ? `${futureIncome - futureExpenses >= 0 ? '+' : ''}${formatCurrency(futureIncome - futureExpenses)} ${t('dashboard.pending')}`
+                : undefined}
+              trendUp={futureIncome - futureExpenses >= 0}
               delay={0}
             />
             <StatCard
@@ -164,6 +192,8 @@ export default function DashboardPage() {
               value={formatCurrency(totalIncome)}
               icon={TrendingUp}
               color="green"
+              trend={futureIncome > 0 ? `${formatCurrency(futureIncome)} ${t('dashboard.future')}` : undefined}
+              trendUp={true}
               delay={0.1}
             />
             <StatCard
@@ -171,6 +201,8 @@ export default function DashboardPage() {
               value={formatCurrency(totalExpenses)}
               icon={TrendingDown}
               color="red"
+              trend={futureExpenses > 0 ? `${formatCurrency(futureExpenses)} ${t('dashboard.future')}` : undefined}
+              trendUp={false}
               delay={0.2}
             />
             <StatCard

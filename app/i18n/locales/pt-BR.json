@@ -18,6 +18,8 @@
     "totalExpenses": "Total de Gastos",
     "dailyYield": "Rendimento Diário",
     "perMonth": "/mês",
+    "pending": "pendente",
+    "future": "a receber",
     "recentTransactions": "Transações Recentes",
     "noTransactions": "Nenhuma transação ainda",
     "clickToAdd": "Clique nos botões acima para adicionar"

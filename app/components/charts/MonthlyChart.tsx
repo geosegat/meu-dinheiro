@@ -13,6 +13,12 @@ interface MonthlyChartProps {
 export default function MonthlyChart({ transactions }: MonthlyChartProps) {
   const { t, formatCurrency } = useTranslation();
 
+  const now = new Date();
+  now.setHours(23, 59, 59, 999);
+  
+  const pastTransactions = transactions.filter((tx) => new Date(tx.date) <= now);
+  const futureTransactions = transactions.filter((tx) => new Date(tx.date) > now);
+
   const expensesByCategory = transactions
     .filter((t) => t.type === 'expense')
     .reduce((acc: Record<string, number>, t) => {
@@ -31,6 +37,18 @@ export default function MonthlyChart({ transactions }: MonthlyChartProps) {
 
   const totalExpenses = Object.values(expensesByCategory).reduce((sum, val) => sum + val, 0);
   const totalIncome = Object.values(incomesByCategory).reduce((sum, val) => sum + val, 0);
+
+  const futureIncome = futureTransactions
+    .filter((t) => t.type === 'income')
+    .reduce((sum, t) => sum + t.amount, 0);
+  
+  const futureExpenses = futureTransactions
+    .filter((t) => t.type === 'expense')
+    .reduce((sum, t) => sum + t.amount, 0);
+
+  const currentBalance = pastTransactions.reduce((sum, tx) => {
+    return tx.type === 'income' ? sum + tx.amount : sum - tx.amount;
+  }, 0);
 
   if (transactions.length === 0) {
     return (
@@ -64,9 +82,16 @@ export default function MonthlyChart({ transactions }: MonthlyChartProps) {
               <TrendingUp className="w-4 h-4 text-emerald-600" />
             </div>
             <p className="text-2xl font-bold text-emerald-900">{formatCurrency(totalIncome)}</p>
-            <p className="text-xs text-emerald-600 mt-1">
-              {Object.keys(incomesByCategory).length} {t('charts.categories')}
-            </p>
+            <div className="flex items-center justify-between mt-1">
+              <p className="text-xs text-emerald-600">
+                {Object.keys(incomesByCategory).length} {t('charts.categories')}
+              </p>
+              {futureIncome > 0 && (
+                <p className="text-xs text-emerald-500">
+                  +{formatCurrency(futureIncome)} {t('dashboard.future')}
+                </p>
+              )}
+            </div>
           </div>
 
           <div className="p-4 rounded-xl bg-linear-to-br from-rose-50 to-red-50 border border-rose-100">
@@ -75,30 +100,42 @@ export default function MonthlyChart({ transactions }: MonthlyChartProps) {
               <TrendingDown className="w-4 h-4 text-rose-600" />
             </div>
             <p className="text-2xl font-bold text-rose-900">{formatCurrency(totalExpenses)}</p>
-            <p className="text-xs text-rose-600 mt-1">
-              {Object.keys(expensesByCategory).length} {t('charts.categories')}
-            </p>
+            <div className="flex items-center justify-between mt-1">
+              <p className="text-xs text-rose-600">
+                {Object.keys(expensesByCategory).length} {t('charts.categories')}
+              </p>
+              {futureExpenses > 0 && (
+                <p className="text-xs text-rose-500">
+                  {formatCurrency(futureExpenses)} {t('dashboard.future')}
+                </p>
+              )}
+            </div>
           </div>
         </div>
 
         <div
           className={`p-4 rounded-xl border-2 ${
-            totalIncome - totalExpenses >= 0
+            currentBalance >= 0
               ? 'bg-blue-50 border-blue-200'
               : 'bg-orange-50 border-orange-200'
           }`}
         >
           <div className="flex items-center justify-between mb-1">
-            <span className="text-sm font-medium text-gray-700">{t('charts.balance')}</span>
+            <span className="text-sm font-medium text-gray-700">{t('dashboard.currentBalance')}</span>
             <Wallet className="w-4 h-4 text-gray-600" />
           </div>
           <p
             className={`text-2xl font-bold ${
-              totalIncome - totalExpenses >= 0 ? 'text-blue-900' : 'text-orange-900'
+              currentBalance >= 0 ? 'text-blue-900' : 'text-orange-900'
             }`}
           >
-            {formatCurrency(totalIncome - totalExpenses)}
+            {formatCurrency(currentBalance)}
           </p>
+          {(futureIncome > 0 || futureExpenses > 0) && (
+            <p className="text-xs text-gray-500 mt-1">
+              {t('charts.balance')}: {formatCurrency(currentBalance + futureIncome - futureExpenses)}
+            </p>
+          )}
         </div>
       </div>
     </motion.div>
