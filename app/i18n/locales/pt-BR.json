@@ -155,12 +155,27 @@
   },
   "settings": {
     "title": "Configurações",
+    "subtitle": "Personalize sua experiência e gerencie seus dados",
+    "preferences": "Preferências",
     "language": "Idioma",
     "currency": "Moeda",
     "ratesUpdated": "Taxas atualizadas em",
     "ratesError": "Erro ao carregar taxas",
     "refreshRates": "Atualizar taxas",
-    "loading": "Carregando..."
+    "loading": "Carregando...",
+    "backupTitle": "Backup e Restauração",
+    "backupDescription": "Exporte seus dados para fazer backup ou transferir para outro dispositivo",
+    "exportData": "Exportar Dados",
+    "exportDescription": "Baixe todos os seus dados em formato JSON",
+    "export": "Exportar",
+    "exportSuccess": "Dados exportados com sucesso!",
+    "exportError": "Erro ao exportar dados",
+    "importData": "Importar Dados",
+    "importDescription": "Restaure seus dados de um backup anterior",
+    "import": "Importar",
+    "importSuccess": "Dados importados! Recarregando...",
+    "importError": "Erro ao importar dados. Verifique o arquivo.",
+    "backupWarning": "⚠️ A importação substituirá todos os dados atuais. Faça backup antes de importar!"
   },
   "cards": {
     "customize": "Personalizar Cards",

@@ -15,13 +15,13 @@ import {
   Settings,
 } from 'lucide-react';
 import { useTranslation } from '@/app/i18n/useTranslation';
-import SettingsModal from './SettingsModal';
 
 const navItems = [
   { key: 'dashboard', icon: LayoutDashboard, href: '/' },
   { key: 'income', icon: TrendingUp, href: '/rendas' },
   { key: 'expenses', icon: TrendingDown, href: '/gastos' },
   { key: 'investments', icon: PiggyBank, href: '/investimentos' },
+  { key: 'settings', icon: Settings, href: '/configuracoes' },
 ];
 
 interface AppLayoutProps {
@@ -30,7 +30,6 @@ interface AppLayoutProps {
 
 export default function AppLayout({ children }: AppLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
   const pathname = usePathname();
   const { t } = useTranslation();
 
@@ -97,18 +96,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
                   );
                 })}
               </nav>
-              <div className="p-4 border-t border-gray-100">
-                <button
-                  onClick={() => {
-                    setSidebarOpen(false);
-                    setSettingsOpen(true);
-                  }}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-100 transition-all w-full"
-                >
-                  <Settings className="w-5 h-5" />
-                  <span className="font-medium">{t('nav.settings')}</span>
-                </button>
-              </div>
             </motion.div>
           </>
         )}
@@ -145,20 +132,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
             })}
           </nav>
         </div>
-        <div className="p-6 border-t border-gray-100">
-          <button
-            onClick={() => setSettingsOpen(true)}
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-100 transition-all w-full"
-          >
-            <Settings className="w-5 h-5" />
-            <span className="font-medium">{t('nav.settings')}</span>
-          </button>
-        </div>
       </div>
 
       <div className="lg:pl-64 pt-16 lg:pt-0">{children}</div>
-
-      <SettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} />
     </div>
   );
 }
