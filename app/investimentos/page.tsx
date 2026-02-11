@@ -51,7 +51,7 @@ export default function InvestimentosPage() {
   return (
     <AppLayout>
       <div className="min-h-screen bg-gray-50/50 p-6 lg:p-8">
-        <div className="max-w-6xl mx-auto space-y-8">
+        <div className="max-w-7xl mx-auto space-y-8">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
