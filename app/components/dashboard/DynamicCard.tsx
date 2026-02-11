@@ -39,30 +39,25 @@ export default function DynamicCard({
 }: DynamicCardProps) {
   const { t, formatCurrency } = useTranslation();
 
-  // Separa transações por período
   const now = new Date();
   now.setHours(23, 59, 59, 999);
 
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
 
-  // Transações do mês atual
   const currentMonthTransactions = transactions.filter((tx) => {
     const txDate = new Date(tx.date);
     return txDate.getMonth() === currentMonth && txDate.getFullYear() === currentYear;
   });
 
-  // Transações do mês passado
   const lastMonth = new Date(currentYear, currentMonth - 1, 1);
   const lastMonthTransactions = transactions.filter((tx) => {
     const txDate = new Date(tx.date);
     return txDate.getMonth() === lastMonth.getMonth() && txDate.getFullYear() === lastMonth.getFullYear();
   });
 
-  // Transações passadas (até hoje)
   const pastTransactions = transactions.filter((tx) => new Date(tx.date) <= now);
 
-  // Calcula totais
   const totalIncome = currentMonthTransactions
     .filter((tx) => tx.type === 'income')
     .reduce((sum, tx) => sum + tx.amount, 0);
@@ -80,7 +75,6 @@ export default function DynamicCard({
     return sum + dados.rendimentoDiario;
   }, 0);
 
-  // Calcula maior categoria de gasto
   const expensesByCategory = currentMonthTransactions
     .filter((tx) => tx.type === 'expense')
     .reduce((acc: Record<string, number>, tx) => {
@@ -91,22 +85,19 @@ export default function DynamicCard({
 
   const topCategory = Object.entries(expensesByCategory).sort((a, b) => b[1] - a[1])[0];
 
-  // Calcula % poupado
   const savingsRate = totalIncome > 0 ? ((totalIncome - totalExpenses) / totalIncome) * 100 : 0;
 
-  // Investimentos totais
-  const totalInvested = investments.reduce((sum, inv) => sum + inv.valorInvestido, 0);
+  const totalInvested = investments.reduce((sum, inv) => sum + inv.valor_inicial, 0);
   const totalInvestmentBalance = investments.reduce((sum, inv) => {
     const dados = calcularRendimento(inv);
     return sum + dados.saldoAtual;
   }, 0);
 
-  // Pendências (transações futuras)
+
   const futurePendingCount = transactions.filter(
     (tx) => new Date(tx.date) > now
   ).length;
 
-  // Renderiza o card baseado no tipo
   switch (type) {
     case 'current-balance':
       return (
