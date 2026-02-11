@@ -138,19 +138,17 @@ export default function DashboardPage() {
               <CardSelector selectedCards={selectedCards} onSave={handleSaveCards} />
               <Button
                 onClick={() => setShowIncomeForm(true)}
-                className="bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-600/20 flex-1 sm:flex-none"
+                className="bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-600/20"
               >
                 <ArrowUpRight className="w-4 h-4 mr-2" />
-                <span className="hidden xs:inline">{t('dashboard.newIncome')}</span>
-                <span className="inline xs:hidden">Renda</span>
+                {t('dashboard.newIncome')}
               </Button>
               <Button
                 onClick={() => setShowExpenseForm(true)}
-                className="bg-rose-600 hover:bg-rose-700 shadow-lg shadow-rose-600/20 flex-1 sm:flex-none"
+                className="bg-rose-600 hover:bg-rose-700 shadow-lg shadow-rose-600/20"
               >
                 <ArrowDownRight className="w-4 h-4 mr-2" />
-                <span className="hidden xs:inline">{t('dashboard.newExpense')}</span>
-                <span className="inline xs:hidden">Gasto</span>
+                {t('dashboard.newExpense')}
               </Button>
             </div>
           </motion.div>

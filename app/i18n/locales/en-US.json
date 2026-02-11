@@ -12,6 +12,8 @@
     "subtitle": "Overview of your finances",
     "newIncome": "New Income",
     "newExpense": "New Expense",
+    "newIncomeShort": "Income",
+    "newExpenseShort": "Expense",
     "period": "Period:",
     "currentBalance": "Current Balance",
     "totalIncome": "Total Income",

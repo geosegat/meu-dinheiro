@@ -12,6 +12,8 @@
     "subtitle": "Visão geral das suas finanças",
     "newIncome": "Nova Renda",
     "newExpense": "Novo Gasto",
+    "newIncomeShort": "Renda",
+    "newExpenseShort": "Gasto",
     "period": "Período:",
     "currentBalance": "Saldo Atual",
     "totalIncome": "Total de Rendas",
