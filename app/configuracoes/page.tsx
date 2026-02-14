@@ -11,6 +11,9 @@ import {
   LogOut,
   Trash2,
   X,
+  Download,
+  Upload,
+  Smartphone,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AppLayout from '../components/layout/AppLayout';
@@ -30,6 +33,38 @@ const currencyOptions = [
   { value: 'EUR' as const, symbol: '€' },
 ];
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type CloudData = Record<string, any> | null;
+
+function hasLocalData(): boolean {
+  const transactions = localStorage.getItem('finance_transactions');
+  const investments = localStorage.getItem('finance_investments');
+  const parsedT = transactions ? JSON.parse(transactions) : [];
+  const parsedI = investments ? JSON.parse(investments) : [];
+  return parsedT.length > 0 || parsedI.length > 0;
+}
+
+function hasCloudData(data: CloudData): boolean {
+  if (!data) return false;
+  const t = data.transactions || [];
+  const i = data.investments || [];
+  return t.length > 0 || i.length > 0;
+}
+
+function applyCloudData(data: CloudData) {
+  if (!data) return;
+  if (data.transactions)
+    localStorage.setItem('finance_transactions', JSON.stringify(data.transactions));
+  if (data.investments)
+    localStorage.setItem('finance_investments', JSON.stringify(data.investments));
+  if (data.dashboard_cards)
+    localStorage.setItem('dashboard_cards', JSON.stringify(data.dashboard_cards));
+  if (data.locale) localStorage.setItem('app_locale', data.locale);
+  if (data.currency) localStorage.setItem('app_currency', data.currency);
+  if (data.exchange_rates)
+    localStorage.setItem('exchange_rates', JSON.stringify(data.exchange_rates));
+}
+
 export default function ConfiguracoesPage() {
   const { t, locale, setLocale, currency, setCurrency, exchangeRates, refreshRates, ratesLoading } =
     useTranslation();
@@ -38,6 +73,9 @@ export default function ConfiguracoesPage() {
   const [loadingFromCloud, setLoadingFromCloud] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [showConflictModal, setShowConflictModal] = useState(false);
+  const [pendingCloudData, setPendingCloudData] = useState<CloudData>(null);
+  const [conflictInfo, setConflictInfo] = useState({ localTransactions: 0, localInvestments: 0, cloudTransactions: 0, cloudInvestments: 0 });
 
   useEffect(() => {
     if (session?.user?.email && !localStorage.getItem('cloud_loaded')) {
@@ -50,18 +88,30 @@ export default function ConfiguracoesPage() {
           if (response.ok) {
             const { data } = await response.json();
 
-            if (data) {
-              if (data.transactions)
-                localStorage.setItem('finance_transactions', JSON.stringify(data.transactions));
-              if (data.investments)
-                localStorage.setItem('finance_investments', JSON.stringify(data.investments));
-              if (data.dashboard_cards)
-                localStorage.setItem('dashboard_cards', JSON.stringify(data.dashboard_cards));
-              if (data.locale) localStorage.setItem('app_locale', data.locale);
-              if (data.currency) localStorage.setItem('app_currency', data.currency);
-              if (data.exchange_rates)
-                localStorage.setItem('exchange_rates', JSON.stringify(data.exchange_rates));
+            const localHasData = hasLocalData();
+            const cloudHasData = hasCloudData(data);
+
+            if (localHasData && cloudHasData) {
+              // Conflito: ambos tem dados, perguntar ao usuário
+              const localT = JSON.parse(localStorage.getItem('finance_transactions') || '[]');
+              const localI = JSON.parse(localStorage.getItem('finance_investments') || '[]');
+              setPendingCloudData(data);
+              setConflictInfo({
+                localTransactions: localT.length,
+                localInvestments: localI.length,
+                cloudTransactions: (data.transactions || []).length,
+                cloudInvestments: (data.investments || []).length,
+              });
+              setShowConflictModal(true);
+              return; // Não marca cloud_loaded ainda
+            } else if (cloudHasData) {
+              // Só nuvem tem dados, aplica direto
+              applyCloudData(data);
+            } else if (localHasData) {
+              // Só local tem dados, envia para nuvem
+              syncNow();
             }
+            // Se nenhum tem dados, nada a fazer
           }
 
           localStorage.setItem('cloud_loaded', 'true');
@@ -74,13 +124,28 @@ export default function ConfiguracoesPage() {
 
       loadFromCloud();
     }
-  }, [session]);
+  }, [session, syncNow]);
 
   useEffect(() => {
     if (!session) {
       localStorage.removeItem('cloud_loaded');
     }
   }, [session]);
+
+  const handleConflictChoice = (choice: 'cloud' | 'local') => {
+    if (choice === 'cloud') {
+      // Sobrescrever local com dados da nuvem
+      applyCloudData(pendingCloudData);
+    } else {
+      // Manter dados locais e enviar para nuvem
+      syncNow();
+    }
+
+    localStorage.setItem('cloud_loaded', 'true');
+    setPendingCloudData(null);
+    setShowConflictModal(false);
+    window.location.reload();
+  };
 
   const handleClearData = () => {
     localStorage.removeItem('finance_transactions');
@@ -89,7 +154,6 @@ export default function ConfiguracoesPage() {
     localStorage.removeItem('exchange_rates');
     localStorage.removeItem('cloud_loaded');
 
-    // Sync limpo pro backend
     syncNow();
 
     setShowDeleteModal(false);
@@ -121,12 +185,12 @@ export default function ConfiguracoesPage() {
               )}
               <div>
                 <h2 className="text-lg font-bold text-gray-900">
-                  {session ? 'Sincronização em Nuvem' : 'Conectar com Google'}
+                  {session ? t('settings.cloudSync') : t('settings.connectGoogle')}
                 </h2>
                 <p className="text-sm text-gray-600 mt-1">
                   {session
-                    ? 'Seus dados estão sendo sincronizados automaticamente'
-                    : 'Faça login para sincronizar seus dados entre dispositivos'}
+                    ? t('settings.cloudSyncDesc')
+                    : t('settings.connectGoogleDesc')}
                 </p>
               </div>
             </div>
@@ -142,7 +206,7 @@ export default function ConfiguracoesPage() {
                   <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
                   <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                 </svg>
-                Conectar com Google
+                {t('settings.connectGoogle')}
               </Button>
             ) : (
               <div className="space-y-4">
@@ -160,7 +224,7 @@ export default function ConfiguracoesPage() {
                   </div>
                   <Button onClick={() => signOut()} variant="outline" size="sm" className="gap-2">
                     <LogOut className="w-4 h-4" />
-                    Sair
+                    {t('settings.signOut')}
                   </Button>
                 </div>
 
@@ -170,15 +234,15 @@ export default function ConfiguracoesPage() {
                       <>
                         <RefreshCw className="w-5 h-5 text-blue-500 animate-spin" />
                         <div>
-                          <p className="text-sm font-medium text-gray-900">Sincronizando...</p>
-                          <p className="text-xs text-gray-500">Salvando seus dados</p>
+                          <p className="text-sm font-medium text-gray-900">{t('settings.syncing')}</p>
+                          <p className="text-xs text-gray-500">{t('settings.savingData')}</p>
                         </div>
                       </>
                     ) : syncError ? (
                       <>
                         <AlertCircle className="w-5 h-5 text-red-500" />
                         <div>
-                          <p className="text-sm font-medium text-gray-900">Erro na sincronização</p>
+                          <p className="text-sm font-medium text-gray-900">{t('settings.syncError')}</p>
                           <p className="text-xs text-gray-500">{syncError}</p>
                         </div>
                       </>
@@ -186,9 +250,9 @@ export default function ConfiguracoesPage() {
                       <>
                         <Check className="w-5 h-5 text-green-500" />
                         <div>
-                          <p className="text-sm font-medium text-gray-900">Sincronizado</p>
+                          <p className="text-sm font-medium text-gray-900">{t('settings.synced')}</p>
                           <p className="text-xs text-gray-500">
-                            Última: {new Date(lastSyncTime).toLocaleTimeString(locale)}
+                            {t('settings.lastSync')}: {new Date(lastSyncTime).toLocaleTimeString(locale)}
                           </p>
                         </div>
                       </>
@@ -196,8 +260,8 @@ export default function ConfiguracoesPage() {
                       <>
                         <Cloud className="w-5 h-5 text-gray-400" />
                         <div>
-                          <p className="text-sm font-medium text-gray-900">Aguardando mudanças</p>
-                          <p className="text-xs text-gray-500">Auto-sync ativo</p>
+                          <p className="text-sm font-medium text-gray-900">{t('settings.waitingChanges')}</p>
+                          <p className="text-xs text-gray-500">{t('settings.autoSyncActive')}</p>
                         </div>
                       </>
                     )}
@@ -211,14 +275,14 @@ export default function ConfiguracoesPage() {
                     className="gap-2"
                   >
                     <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
-                    Sincronizar
+                    {t('settings.sync')}
                   </Button>
                 </div>
 
                 {loadingFromCloud && (
                   <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-100 rounded-lg">
                     <RefreshCw className="w-4 h-4 text-blue-600 animate-spin" />
-                    <p className="text-sm text-blue-700">Carregando dados da nuvem...</p>
+                    <p className="text-sm text-blue-700">{t('settings.loadingCloud')}</p>
                   </div>
                 )}
               </div>
@@ -313,10 +377,9 @@ export default function ConfiguracoesPage() {
           >
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-lg font-bold text-gray-900">Limpar Dados</h2>
+                <h2 className="text-lg font-bold text-gray-900">{t('settings.clearData')}</h2>
                 <p className="text-sm text-gray-500 mt-1">
-                  Remove todas as transações, investimentos e configurações de cards.
-                  Esta ação não pode ser desfeita.
+                  {t('settings.clearDataDesc')}
                 </p>
               </div>
               <Button
@@ -325,14 +388,96 @@ export default function ConfiguracoesPage() {
                 className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 gap-2 shrink-0"
               >
                 <Trash2 className="w-4 h-4" />
-                Limpar tudo
+                {t('settings.clearAll')}
               </Button>
             </div>
           </motion.div>
         </div>
       </div>
 
-      {/* Modal de confirmação */}
+      {/* Modal de conflito de sincronização */}
+      <AnimatePresence>
+        {showConflictModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-2xl p-6 w-full max-w-lg shadow-xl"
+            >
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
+                  <AlertCircle className="w-5 h-5 text-amber-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900">{t('settings.conflictTitle')}</h3>
+                  <p className="text-sm text-gray-500">{t('settings.conflictDesc')}</p>
+                </div>
+              </div>
+
+              {/* Comparação visual */}
+              <div className="grid grid-cols-2 gap-3 mb-5">
+                <div className="p-4 rounded-xl bg-blue-50 border border-blue-100">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Cloud className="w-4 h-4 text-blue-600" />
+                    <span className="text-sm font-semibold text-blue-900">{t('settings.cloudData')}</span>
+                  </div>
+                  <p className="text-xs text-blue-700">
+                    {conflictInfo.cloudTransactions} {t('settings.conflictTransactions')}
+                  </p>
+                  <p className="text-xs text-blue-700">
+                    {conflictInfo.cloudInvestments} {t('settings.conflictInvestments')}
+                  </p>
+                </div>
+                <div className="p-4 rounded-xl bg-green-50 border border-green-100">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Smartphone className="w-4 h-4 text-green-600" />
+                    <span className="text-sm font-semibold text-green-900">{t('settings.localData')}</span>
+                  </div>
+                  <p className="text-xs text-green-700">
+                    {conflictInfo.localTransactions} {t('settings.conflictTransactions')}
+                  </p>
+                  <p className="text-xs text-green-700">
+                    {conflictInfo.localInvestments} {t('settings.conflictInvestments')}
+                  </p>
+                </div>
+              </div>
+
+              {/* Opções */}
+              <div className="space-y-3">
+                <button
+                  onClick={() => handleConflictChoice('cloud')}
+                  className="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-blue-200 bg-blue-50/50 hover:bg-blue-100 transition-colors text-left"
+                >
+                  <Download className="w-5 h-5 text-blue-600 shrink-0" />
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">{t('settings.useCloudData')}</p>
+                    <p className="text-xs text-gray-500">{t('settings.useCloudDataDesc')}</p>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => handleConflictChoice('local')}
+                  className="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-green-200 bg-green-50/50 hover:bg-green-100 transition-colors text-left"
+                >
+                  <Upload className="w-5 h-5 text-green-600 shrink-0" />
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">{t('settings.useLocalData')}</p>
+                    <p className="text-xs text-gray-500">{t('settings.useLocalDataDesc')}</p>
+                  </div>
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Modal de confirmação de limpeza */}
       <AnimatePresence>
         {showDeleteModal && (
           <motion.div
@@ -354,7 +499,7 @@ export default function ConfiguracoesPage() {
                   <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
                     <Trash2 className="w-5 h-5 text-red-600" />
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900">Limpar todos os dados?</h3>
+                  <h3 className="text-lg font-bold text-gray-900">{t('settings.clearConfirmTitle')}</h3>
                 </div>
                 <button
                   onClick={() => setShowDeleteModal(false)}
@@ -365,20 +510,19 @@ export default function ConfiguracoesPage() {
               </div>
 
               <p className="text-sm text-gray-600 mb-4">
-                Isso vai remover <strong>todas</strong> as suas transações, investimentos e configurações de cards.
-                A ação é irreversível.
+                {t('settings.clearConfirmDesc')}
               </p>
 
               <div className="mb-4">
                 <label className="text-sm font-medium text-gray-700 block mb-2">
-                  Digite <span className="font-bold text-red-600">LIMPAR</span> para confirmar:
+                  {t('settings.clearConfirmType')} <span className="font-bold text-red-600">{t('settings.clearConfirmWord')}</span> {t('settings.clearConfirmToConfirm')}:
                 </label>
                 <input
                   type="text"
                   value={deleteConfirmText}
                   onChange={(e) => setDeleteConfirmText(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                  placeholder="LIMPAR"
+                  placeholder={t('settings.clearConfirmWord')}
                 />
               </div>
 
@@ -391,15 +535,15 @@ export default function ConfiguracoesPage() {
                   variant="outline"
                   className="flex-1"
                 >
-                  Cancelar
+                  {t('forms.cancel')}
                 </Button>
                 <Button
                   onClick={handleClearData}
-                  disabled={deleteConfirmText !== 'LIMPAR'}
+                  disabled={deleteConfirmText !== t('settings.clearConfirmWord')}
                   className="flex-1 bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
-                  Confirmar
+                  {t('settings.clearConfirmBtn')}
                 </Button>
               </div>
             </motion.div>
