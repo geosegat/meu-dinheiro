@@ -34,6 +34,8 @@ export function useAutoSync(): UseAutoSyncReturn {
   const lastKnownCloudSync = useRef<string | null>(null);
   const isSyncingRef = useRef(false);
 
+  const lastLocalChange = useRef<number>(0);
+
   const syncNow = useCallback(async () => {
     if (!session?.user?.email || isSyncingRef.current) return;
 
@@ -42,6 +44,35 @@ export function useAutoSync(): UseAutoSyncReturn {
       setIsSyncing(true);
       setError(null);
 
+      // 1. Primeiro puxa da nuvem para ver se tem dados mais novos
+      const getResponse = await fetch('/api/sync');
+      if (getResponse.ok) {
+        const { data: cloudData, lastSync } = await getResponse.json();
+
+        if (cloudData && lastSync) {
+          const localTransactions = localStorage.getItem('finance_transactions') || '[]';
+          const localInvestments = localStorage.getItem('finance_investments') || '[]';
+          const cloudTransactions = JSON.stringify(cloudData.transactions || []);
+          const cloudInvestments = JSON.stringify(cloudData.investments || []);
+
+          const cloudIsNewer = lastKnownCloudSync.current !== lastSync;
+          const localIsDifferent =
+            localTransactions !== cloudTransactions || localInvestments !== cloudInvestments;
+
+          if (cloudIsNewer && localIsDifferent && lastLocalChange.current === 0) {
+            // Nuvem tem dados diferentes e não houve mudança local recente -> puxar
+            applyCloudData(cloudData);
+            lastKnownCloudSync.current = lastSync;
+            setLastSyncTime(new Date());
+            window.dispatchEvent(
+              new CustomEvent('localStorageChange', { detail: { key: 'poll_update' } })
+            );
+            return;
+          }
+        }
+      }
+
+      // 2. Upload dos dados locais (houve mudança local ou nuvem está desatualizada)
       const data = {
         transactions: JSON.parse(localStorage.getItem('finance_transactions') || '[]'),
         investments: JSON.parse(localStorage.getItem('finance_investments') || '[]'),
@@ -63,6 +94,7 @@ export function useAutoSync(): UseAutoSyncReturn {
       if (result.lastSync) {
         lastKnownCloudSync.current = result.lastSync;
       }
+      lastLocalChange.current = 0;
       setLastSyncTime(new Date());
     } catch (err) {
       console.error('Erro na sincronização:', err);
@@ -79,6 +111,9 @@ export function useAutoSync(): UseAutoSyncReturn {
       const detail = (e as CustomEvent).detail;
       // Ignora eventos do próprio polling para não criar loop
       if (detail?.key === 'poll_update') return;
+
+      // Marca que houve mudança local
+      lastLocalChange.current = Date.now();
 
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
       debounceTimerRef.current = setTimeout(() => syncNow(), 2000);
