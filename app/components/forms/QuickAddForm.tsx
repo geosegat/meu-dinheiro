@@ -6,9 +6,10 @@ import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { expenseCategories, incomeCategories } from '../hooks/useLocalStorage';
+import { expenseCategories, incomeCategories, useLocalStorage } from '../hooks/useLocalStorage';
 import { Transaction, Template } from '@/types/finance';
 import { useTranslation } from '@/app/i18n/useTranslation';
+import { getCategoryDisplayName } from '../hooks/useCategories';
 
 interface QuickAddFormProps {
   type: 'expense' | 'income';
@@ -34,7 +35,14 @@ export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickA
   const [date, setDate] = useState(currentDate);
   const [time, setTime] = useState(currentTime);
 
-  const templates = type === 'expense' ? expenseCategories : incomeCategories;
+  const defaultTemplates = type === 'expense' ? expenseCategories : incomeCategories;
+  const [customExpense] = useLocalStorage<Template[]>('custom_expense_categories', []);
+  const [customIncome] = useLocalStorage<Template[]>('custom_income_categories', []);
+  const [hiddenExpense] = useLocalStorage<string[]>('hidden_expense_categories', []);
+  const [hiddenIncome] = useLocalStorage<string[]>('hidden_income_categories', []);
+  const hidden = type === 'expense' ? hiddenExpense : hiddenIncome;
+  const custom = type === 'expense' ? customExpense : customIncome;
+  const templates = [...defaultTemplates.filter((c) => !hidden.includes(c.key)), ...custom];
   const title = type === 'expense' ? t('forms.newExpense') : t('forms.newIncome');
 
   const handleSubmit = () => {
@@ -142,7 +150,7 @@ export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickA
                 >
                   <div className="text-xl sm:text-2xl mb-0.5 sm:mb-1">{template.icon}</div>
                   <p className="text-[10px] sm:text-xs font-medium text-gray-700 truncate leading-tight">
-                    {t(`categories.${type}.${template.key}`)}
+                    {getCategoryDisplayName(template.key, type, t)}
                   </p>
                 </motion.button>
               ))}

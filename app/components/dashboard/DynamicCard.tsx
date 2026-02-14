@@ -17,6 +17,7 @@ import { Transaction, Investment } from '@/types/finance';
 import { useTranslation } from '@/app/i18n/useTranslation';
 import { calcularRendimento } from '../finance/InvestmentCard';
 import { expenseCategories } from '../hooks/useLocalStorage';
+import { findCategoryTemplate, getCategoryDisplayName } from '../hooks/useCategories';
 
 interface DynamicCardProps {
   type: DashboardCardType;
@@ -53,7 +54,9 @@ export default function DynamicCard({
   const lastMonth = new Date(currentYear, currentMonth - 1, 1);
   const lastMonthTransactions = transactions.filter((tx) => {
     const txDate = new Date(tx.date);
-    return txDate.getMonth() === lastMonth.getMonth() && txDate.getFullYear() === lastMonth.getFullYear();
+    return (
+      txDate.getMonth() === lastMonth.getMonth() && txDate.getFullYear() === lastMonth.getFullYear()
+    );
   });
 
   const pastTransactions = transactions.filter((tx) => new Date(tx.date) <= now);
@@ -93,10 +96,7 @@ export default function DynamicCard({
     return sum + dados.saldoAtual;
   }, 0);
 
-
-  const futurePendingCount = transactions.filter(
-    (tx) => new Date(tx.date) > now
-  ).length;
+  const futurePendingCount = transactions.filter((tx) => new Date(tx.date) > now).length;
 
   switch (type) {
     case 'current-balance':
@@ -158,11 +158,9 @@ export default function DynamicCard({
 
     case 'monthly-expenses':
       const percentChange =
-        lastMonthExpenses > 0
-          ? ((totalExpenses - lastMonthExpenses) / lastMonthExpenses) * 100
-          : 0;
+        lastMonthExpenses > 0 ? ((totalExpenses - lastMonthExpenses) / lastMonthExpenses) * 100 : 0;
       const lastMonthName = t(`months.${lastMonth.getMonth()}`);
-      
+
       return (
         <StatCard
           title={t('cards.monthlyExpenses.title')}
@@ -193,7 +191,8 @@ export default function DynamicCard({
       );
 
     case 'top-category':
-      const topCategoryTemplate = expenseCategories.find((c) => c.key === topCategory?.[0]);
+      const topCategoryTemplate =
+        findCategoryTemplate(topCategory?.[0] || '', 'expense') || expenseCategories[0];
       return (
         <StatCard
           title={t('cards.topCategory.title')}
@@ -202,7 +201,7 @@ export default function DynamicCard({
           color="red"
           trend={
             topCategory
-              ? `${topCategoryTemplate?.icon || ''} ${t(`categories.expense.${topCategory[0]}`)}`
+              ? `${topCategoryTemplate?.icon || ''} ${getCategoryDisplayName(topCategory[0], 'expense', t)}`
               : t('cards.topCategory.noData')
           }
           trendUp={false}

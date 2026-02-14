@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { expenseCategories, incomeCategories } from '../hooks/useLocalStorage';
+import { findCategoryTemplate, getCategoryDisplayName } from '../hooks/useCategories';
 import { Transaction } from '@/types/finance';
 import { useTranslation } from '@/app/i18n/useTranslation';
 
@@ -17,9 +18,11 @@ interface TransactionItemProps {
 export default function TransactionItem({ transaction, onDelete, index }: TransactionItemProps) {
   const { t, formatCurrency, formatDate, formatTime } = useTranslation();
   const isExpense = transaction.type === 'expense';
-  const templates = isExpense ? expenseCategories : incomeCategories;
+  const catType = isExpense ? 'expense' : 'income';
+  const defaults = isExpense ? expenseCategories : incomeCategories;
   const template =
-    templates.find((c) => c.key === transaction.category) || templates[templates.length - 1];
+    findCategoryTemplate(transaction.category, catType) || defaults[defaults.length - 1];
+  const categoryName = getCategoryDisplayName(transaction.category, catType, t);
 
   return (
     <motion.div
@@ -41,16 +44,11 @@ export default function TransactionItem({ transaction, onDelete, index }: Transa
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
             <p className="font-semibold text-sm sm:text-base text-gray-900 truncate">
-              {transaction.description ||
-                t(
-                  `categories.${transaction.type === 'expense' ? 'expense' : 'income'}.${transaction.category}`
-                )}
+              {transaction.description || categoryName}
             </p>
             <p className="text-xs sm:text-sm text-gray-500 mt-0.5 truncate">
-              {t(
-                `categories.${transaction.type === 'expense' ? 'expense' : 'income'}.${transaction.category}`
-              )}{' '}
-              • {formatDate(transaction.date)} {t('transaction.at')} {formatTime(transaction.date)}
+              {categoryName} • {formatDate(transaction.date)} {t('transaction.at')}{' '}
+              {formatTime(transaction.date)}
             </p>
           </div>
           <Button

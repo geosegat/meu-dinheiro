@@ -1,10 +1,11 @@
 'use client';
 
-import  { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, TrendingDown, Calendar, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocalStorage, expenseCategories } from '../components/hooks/useLocalStorage';
+import { findCategoryTemplate, getCategoryDisplayName } from '../components/hooks/useCategories';
 import TransactionItem from '../components/finance/TransactionItem';
 import QuickAddForm from '../components/forms/QuickAddForm';
 import AppLayout from '../components/layout/AppLayout';
@@ -19,6 +20,15 @@ export default function GastosPage() {
   const [showForm, setShowForm] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState('all');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [hiddenExpense] = useLocalStorage<string[]>('hidden_expense_categories', []);
+  const [customExpense] = useLocalStorage<{ key: string; icon: string; color: string }[]>(
+    'custom_expense_categories',
+    []
+  );
+  const visibleExpenseCategories = [
+    ...expenseCategories.filter((c) => !hiddenExpense.includes(c.key)),
+    ...customExpense,
+  ];
   const { t, formatCurrency } = useTranslation();
 
   const expenseTransactions = transactions
@@ -116,7 +126,7 @@ export default function GastosPage() {
           >
             <h3 className="text-lg font-bold text-gray-900 mb-4">{t('expenses.quickAdd')}</h3>
             <div className="grid grid-cols-4 md:grid-cols-6 gap-3">
-              {expenseCategories.slice(0, 6).map((template) => (
+              {visibleExpenseCategories.slice(0, 6).map((template) => (
                 <motion.button
                   key={template.key}
                   type="button"
@@ -127,7 +137,7 @@ export default function GastosPage() {
                 >
                   <div className="text-2xl mb-2">{template.icon}</div>
                   <p className="text-xs font-medium text-gray-600 truncate">
-                    {t(`categories.expense.${template.key}`)}
+                    {getCategoryDisplayName(template.key, 'expense', t)}
                   </p>
                 </motion.button>
               ))}
@@ -145,13 +155,15 @@ export default function GastosPage() {
                 .sort((a, b) => (b[1] as number) - (a[1] as number))
                 .slice(0, 4)
                 .map(([category, amount]) => {
-                  const template = expenseCategories.find((c) => c.key === category);
+                  const template =
+                    findCategoryTemplate(category, 'expense') ||
+                    expenseCategories[expenseCategories.length - 1];
                   return (
                     <div key={category} className="bg-white rounded-xl p-4 border border-gray-100">
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-xl">{template?.icon || '📦'}</span>
                         <span className="text-sm font-medium text-gray-600">
-                          {t(`categories.expense.${category}`)}
+                          {getCategoryDisplayName(category, 'expense', t)}
                         </span>
                       </div>
                       <p className="text-lg font-bold text-gray-900">
@@ -186,9 +198,9 @@ export default function GastosPage() {
                 className="px-4 py-2 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-rose-500"
               >
                 <option value="all">{t('expenses.allCategories')}</option>
-                {expenseCategories.map((cat) => (
+                {visibleExpenseCategories.map((cat) => (
                   <option key={cat.key} value={cat.key}>
-                    {cat.icon} {t(`categories.expense.${cat.key}`)}
+                    {cat.icon} {getCategoryDisplayName(cat.key, 'expense', t)}
                   </option>
                 ))}
               </select>

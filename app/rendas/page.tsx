@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, TrendingUp, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocalStorage, incomeCategories } from '../components/hooks/useLocalStorage';
+import { findCategoryTemplate, getCategoryDisplayName } from '../components/hooks/useCategories';
 import TransactionItem from '../components/finance/TransactionItem';
 import QuickAddForm from '../components/forms/QuickAddForm';
 import AppLayout from '../components/layout/AppLayout';
@@ -109,13 +110,15 @@ export default function RendasPage() {
               className="grid grid-cols-2 md:grid-cols-4 gap-4"
             >
               {Object.entries(byCategory).map(([category, amount]) => {
-                const template = incomeCategories.find((c) => c.key === category);
+                const template =
+                  findCategoryTemplate(category, 'income') ||
+                  incomeCategories[incomeCategories.length - 1];
                 return (
                   <div key={category} className="bg-white rounded-xl p-4 border border-gray-100">
                     <div className="flex items-center gap-2 mb-2">
                       <span className="text-xl">{template?.icon || '💰'}</span>
                       <span className="text-sm font-medium text-gray-600">
-                        {t(`categories.income.${category}`)}
+                        {getCategoryDisplayName(category, 'income', t)}
                       </span>
                     </div>
                     <p className="text-lg font-bold text-gray-900">

@@ -16,6 +16,22 @@ function applyCloudData(data: Record<string, unknown>) {
   if (data.currency) localStorage.setItem('app_currency', data.currency as string);
   if (data.exchange_rates)
     localStorage.setItem('exchange_rates', JSON.stringify(data.exchange_rates));
+  if (data.custom_expense_categories)
+    localStorage.setItem(
+      'custom_expense_categories',
+      JSON.stringify(data.custom_expense_categories)
+    );
+  if (data.custom_income_categories)
+    localStorage.setItem('custom_income_categories', JSON.stringify(data.custom_income_categories));
+  if (data.category_translations)
+    localStorage.setItem('category_translations', JSON.stringify(data.category_translations));
+  if (data.hidden_expense_categories)
+    localStorage.setItem(
+      'hidden_expense_categories',
+      JSON.stringify(data.hidden_expense_categories)
+    );
+  if (data.hidden_income_categories)
+    localStorage.setItem('hidden_income_categories', JSON.stringify(data.hidden_income_categories));
 }
 
 function getLocalData() {
@@ -26,6 +42,15 @@ function getLocalData() {
     locale: localStorage.getItem('app_locale') || 'pt-BR',
     currency: localStorage.getItem('app_currency') || 'BRL',
     exchange_rates: JSON.parse(localStorage.getItem('exchange_rates') || '{}'),
+    custom_expense_categories: JSON.parse(
+      localStorage.getItem('custom_expense_categories') || '[]'
+    ),
+    custom_income_categories: JSON.parse(localStorage.getItem('custom_income_categories') || '[]'),
+    category_translations: JSON.parse(localStorage.getItem('category_translations') || '{}'),
+    hidden_expense_categories: JSON.parse(
+      localStorage.getItem('hidden_expense_categories') || '[]'
+    ),
+    hidden_income_categories: JSON.parse(localStorage.getItem('hidden_income_categories') || '[]'),
   };
 }
 

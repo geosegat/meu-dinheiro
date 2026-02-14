@@ -38,6 +38,14 @@ export default function CategoriasPage() {
     'custom_income_categories',
     []
   );
+  const [hiddenExpenseCategories, setHiddenExpenseCategories] = useLocalStorage<string[]>(
+    'hidden_expense_categories',
+    []
+  );
+  const [hiddenIncomeCategories, setHiddenIncomeCategories] = useLocalStorage<string[]>(
+    'hidden_income_categories',
+    []
+  );
 
   const [selectedType, setSelectedType] = useState<CategoryType>('expense');
   const [showAddModal, setShowAddModal] = useState(false);
@@ -67,7 +75,14 @@ export default function CategoriasPage() {
     'bg-rose-100',
   ];
 
-  const defaultCategories = selectedType === 'expense' ? expenseCategories : incomeCategories;
+  const hiddenCategories =
+    selectedType === 'expense' ? hiddenExpenseCategories : hiddenIncomeCategories;
+  const setHiddenCategories =
+    selectedType === 'expense' ? setHiddenExpenseCategories : setHiddenIncomeCategories;
+  const allDefaultCategories = selectedType === 'expense' ? expenseCategories : incomeCategories;
+  const defaultCategories = allDefaultCategories.filter(
+    (cat) => !hiddenCategories.includes(cat.key)
+  );
   const customCategories =
     selectedType === 'expense' ? customExpenseCategories : customIncomeCategories;
   const setCustomCategories =
@@ -85,7 +100,7 @@ export default function CategoriasPage() {
     if (!category.isCustom) return; // Can't edit default categories
 
     setEditingCategory(category);
-    setCategoryName(t(`categories.${selectedType}.${category.key}`));
+    setCategoryName(getCategoryName(category));
     setCategoryEmoji(category.icon);
     setCategoryColor(category.color);
     setShowAddModal(true);
@@ -129,15 +144,18 @@ export default function CategoriasPage() {
   };
 
   const handleDeleteCategory = (category: CustomCategory) => {
-    if (!category.isCustom) return;
+    if (category.isCustom) {
+      const updated = customCategories.filter((cat) => cat.key !== category.key);
+      setCustomCategories(updated);
 
-    const updated = customCategories.filter((cat) => cat.key !== category.key);
-    setCustomCategories(updated);
-
-    // Remove translation
-    const translations = JSON.parse(localStorage.getItem('category_translations') || '{}');
-    delete translations[`${selectedType}.${category.key}`];
-    localStorage.setItem('category_translations', JSON.stringify(translations));
+      // Remove translation
+      const translations = JSON.parse(localStorage.getItem('category_translations') || '{}');
+      delete translations[`${selectedType}.${category.key}`];
+      localStorage.setItem('category_translations', JSON.stringify(translations));
+    } else {
+      // Hide default category
+      setHiddenCategories([...hiddenCategories, category.key]);
+    }
   };
 
   const handleReorderCategories = (newOrder: CustomCategory[]) => {
@@ -207,8 +225,15 @@ export default function CategoriasPage() {
               {defaultCategories.map((category) => (
                 <div
                   key={category.key}
-                  className="flex flex-col items-center gap-2 p-3 rounded-xl border border-gray-100 bg-gray-50"
+                  className="group relative flex flex-col items-center gap-2 p-3 rounded-xl border border-gray-100 bg-gray-50"
                 >
+                  <button
+                    onClick={() => handleDeleteCategory(category as CustomCategory)}
+                    className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-full hover:bg-red-100 text-gray-400 hover:text-rose-600"
+                    title={t('categories.removeCategory')}
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
                   <div
                     className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl ${category.color}`}
                   >

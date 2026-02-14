@@ -63,6 +63,22 @@ function applyCloudData(data: CloudData) {
   if (data.currency) localStorage.setItem('app_currency', data.currency);
   if (data.exchange_rates)
     localStorage.setItem('exchange_rates', JSON.stringify(data.exchange_rates));
+  if (data.custom_expense_categories)
+    localStorage.setItem(
+      'custom_expense_categories',
+      JSON.stringify(data.custom_expense_categories)
+    );
+  if (data.custom_income_categories)
+    localStorage.setItem('custom_income_categories', JSON.stringify(data.custom_income_categories));
+  if (data.category_translations)
+    localStorage.setItem('category_translations', JSON.stringify(data.category_translations));
+  if (data.hidden_expense_categories)
+    localStorage.setItem(
+      'hidden_expense_categories',
+      JSON.stringify(data.hidden_expense_categories)
+    );
+  if (data.hidden_income_categories)
+    localStorage.setItem('hidden_income_categories', JSON.stringify(data.hidden_income_categories));
 }
 
 export default function ConfiguracoesPage() {
@@ -107,6 +123,11 @@ export default function ConfiguracoesPage() {
     localStorage.removeItem('dashboard_cards');
     localStorage.removeItem('exchange_rates');
     localStorage.removeItem('cloud_loaded');
+    localStorage.removeItem('custom_expense_categories');
+    localStorage.removeItem('custom_income_categories');
+    localStorage.removeItem('category_translations');
+    localStorage.removeItem('hidden_expense_categories');
+    localStorage.removeItem('hidden_income_categories');
 
     upload();
 

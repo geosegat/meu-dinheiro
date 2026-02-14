@@ -131,29 +131,6 @@
   "transaction": {
     "at": "at"
   },
-  "categories": {
-    "expense": {
-      "food": "Food",
-      "transport": "Transportation",
-      "housing": "Housing",
-      "health": "Health",
-      "leisure": "Entertainment",
-      "education": "Education",
-      "shopping": "Shopping",
-      "streaming": "Streaming",
-      "internet": "Internet",
-      "phone": "Phone",
-      "subscriptions": "Subscriptions",
-      "other": "Other"
-    },
-    "income": {
-      "salary": "Salary",
-      "freelance": "Freelance",
-      "investments": "Investments",
-      "rent": "Rent",
-      "other": "Other"
-    }
-  },
   "settings": {
     "title": "Settings",
     "subtitle": "Customize your experience and manage your data",
@@ -216,19 +193,28 @@
     "name": "Name",
     "namePlaceholder": "e.g. Gym, Streaming...",
     "color": "Color",
+    "removeCategory": "Remove category",
     "expense": {
       "food": "Food",
-      "transport": "Transport",
+      "transport": "Transportation",
+      "housing": "Housing",
       "health": "Health",
+      "leisure": "Entertainment",
       "education": "Education",
-      "entertainment": "Entertainment",
       "shopping": "Shopping",
+      "streaming": "Streaming",
+      "internet": "Internet",
+      "phone": "Phone",
+      "subscriptions": "Subscriptions",
+      "entertainment": "Entertainment",
       "bills": "Bills",
       "other": "Other"
     },
     "income": {
       "salary": "Salary",
       "freelance": "Freelance",
+      "investments": "Investments",
+      "rent": "Rent",
       "investment": "Investment",
       "gift": "Gift",
       "bonus": "Bonus",

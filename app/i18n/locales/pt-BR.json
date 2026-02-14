@@ -131,29 +131,6 @@
   "transaction": {
     "at": "às"
   },
-  "categories": {
-    "expense": {
-      "food": "Alimentação",
-      "transport": "Transporte",
-      "housing": "Moradia",
-      "health": "Saúde",
-      "leisure": "Lazer",
-      "education": "Educação",
-      "shopping": "Compras",
-      "streaming": "Streaming",
-      "internet": "Internet",
-      "phone": "Celular",
-      "subscriptions": "Assinaturas",
-      "other": "Outros"
-    },
-    "income": {
-      "salary": "Salário",
-      "freelance": "Freelance",
-      "investments": "Investimentos",
-      "rent": "Aluguel",
-      "other": "Outros"
-    }
-  },
   "settings": {
     "title": "Configurações",
     "subtitle": "Personalize sua experiência e gerencie seus dados",
@@ -216,19 +193,28 @@
     "name": "Nome",
     "namePlaceholder": "Ex: Academia, Streaming...",
     "color": "Cor",
+    "removeCategory": "Remover categoria",
     "expense": {
       "food": "Alimentação",
       "transport": "Transporte",
+      "housing": "Moradia",
       "health": "Saúde",
+      "leisure": "Lazer",
       "education": "Educação",
-      "entertainment": "Lazer",
       "shopping": "Compras",
+      "streaming": "Streaming",
+      "internet": "Internet",
+      "phone": "Celular",
+      "subscriptions": "Assinaturas",
+      "entertainment": "Lazer",
       "bills": "Contas",
       "other": "Outros"
     },
     "income": {
       "salary": "Salário",
       "freelance": "Freelance",
+      "investments": "Investimentos",
+      "rent": "Aluguel",
       "investment": "Investimento",
       "gift": "Presente",
       "bonus": "Bônus",

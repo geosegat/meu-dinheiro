@@ -131,29 +131,6 @@
   "transaction": {
     "at": "a las"
   },
-  "categories": {
-    "expense": {
-      "food": "Alimentación",
-      "transport": "Transporte",
-      "housing": "Vivienda",
-      "health": "Salud",
-      "leisure": "Ocio",
-      "education": "Educación",
-      "shopping": "Compras",
-      "streaming": "Streaming",
-      "internet": "Internet",
-      "phone": "Celular",
-      "subscriptions": "Suscripciones",
-      "other": "Otros"
-    },
-    "income": {
-      "salary": "Salario",
-      "freelance": "Freelance",
-      "investments": "Inversiones",
-      "rent": "Alquiler",
-      "other": "Otros"
-    }
-  },
   "settings": {
     "title": "Configuración",
     "subtitle": "Personaliza tu experiencia y gestiona tus datos",
@@ -216,19 +193,28 @@
     "name": "Nombre",
     "namePlaceholder": "ej. Gimnasio, Streaming...",
     "color": "Color",
+    "removeCategory": "Eliminar categoría",
     "expense": {
       "food": "Alimentación",
       "transport": "Transporte",
+      "housing": "Vivienda",
       "health": "Salud",
+      "leisure": "Ocio",
       "education": "Educación",
-      "entertainment": "Ocio",
       "shopping": "Compras",
+      "streaming": "Streaming",
+      "internet": "Internet",
+      "phone": "Celular",
+      "subscriptions": "Suscripciones",
+      "entertainment": "Ocio",
       "bills": "Facturas",
       "other": "Otros"
     },
     "income": {
       "salary": "Salario",
       "freelance": "Freelance",
+      "investments": "Inversiones",
+      "rent": "Alquiler",
       "investment": "Inversión",
       "gift": "Regalo",
       "bonus": "Bonificación",

@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { Transaction } from '@/types/finance';
 import { expenseCategories } from '../../components/hooks/useLocalStorage';
+import { findCategoryTemplate, getCategoryDisplayName } from '../hooks/useCategories';
 import { useTranslation } from '@/app/i18n/useTranslation';
 
 const COLORS = [
@@ -108,7 +109,9 @@ export default function CategoryBreakdown({ transactions }: CategoryBreakdownPro
         </div>
         <div className="flex-1 space-y-3 w-full">
           {chartData.map((item, index) => {
-            const template = expenseCategories.find((c) => c.key === item.name);
+            const template =
+              findCategoryTemplate(item.name, 'expense') ||
+              expenseCategories[expenseCategories.length - 1];
             const percentage = ((item.value / total) * 100).toFixed(1);
             return (
               <div
@@ -123,7 +126,7 @@ export default function CategoryBreakdown({ transactions }: CategoryBreakdownPro
                   <div className="flex items-center gap-2 flex-1 min-w-0">
                     <span className="text-lg">{template?.icon}</span>
                     <span className="text-sm font-medium text-gray-700 truncate">
-                      {t(`categories.expense.${item.name}`)}
+                      {getCategoryDisplayName(item.name, 'expense', t)}
                     </span>
                   </div>
                 </div>
