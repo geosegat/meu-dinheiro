@@ -69,7 +69,7 @@ export default function ConfiguracoesPage() {
   const { t, locale, setLocale, currency, setCurrency, exchangeRates, refreshRates, ratesLoading } =
     useTranslation();
   const { data: session } = useSession();
-  const { isSyncing, lastSyncTime, syncNow, error: syncError } = useAutoSync();
+  const { isSyncing, lastSyncTime, upload, download, error: syncError } = useAutoSync();
   const [loadingFromCloud, setLoadingFromCloud] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
@@ -93,7 +93,7 @@ export default function ConfiguracoesPage() {
     if (choice === 'cloud') {
       applyCloudData(pendingCloudData);
     } else {
-      syncNow();
+      upload();
     }
 
     localStorage.setItem('cloud_loaded', 'true');
@@ -108,7 +108,7 @@ export default function ConfiguracoesPage() {
     localStorage.removeItem('exchange_rates');
     localStorage.removeItem('cloud_loaded');
 
-    syncNow();
+    upload();
 
     setShowDeleteModal(false);
     setDeleteConfirmText('');
@@ -145,7 +145,7 @@ export default function ConfiguracoesPage() {
             } else if (cloudHasData) {
               applyCloudData(data);
             } else if (localHasData) {
-              syncNow();
+              upload();
             }
           }
 
@@ -292,16 +292,28 @@ export default function ConfiguracoesPage() {
                     )}
                   </div>
 
-                  <Button
-                    onClick={() => syncNow()}
-                    disabled={isSyncing}
-                    variant="outline"
-                    size="sm"
-                    className="gap-2"
-                  >
-                    <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
-                    {t('settings.sync')}
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => download()}
+                      disabled={isSyncing}
+                      variant="outline"
+                      size="sm"
+                      className="gap-2"
+                    >
+                      <Download className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
+                      {t('settings.download')}
+                    </Button>
+                    <Button
+                      onClick={() => upload()}
+                      disabled={isSyncing}
+                      variant="outline"
+                      size="sm"
+                      className="gap-2"
+                    >
+                      <Upload className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
+                      {t('settings.upload')}
+                    </Button>
+                  </div>
                 </div>
 
                 {loadingFromCloud && (

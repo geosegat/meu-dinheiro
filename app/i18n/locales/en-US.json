@@ -176,6 +176,8 @@
     "waitingChanges": "Waiting for changes",
     "autoSyncActive": "Auto-sync active",
     "sync": "Sync",
+    "upload": "Upload",
+    "download": "Download",
     "loadingCloud": "Loading data from cloud...",
     "clearData": "Clear Data",
     "clearDataDesc": "Removes all transactions, investments and card settings. This action cannot be undone.",

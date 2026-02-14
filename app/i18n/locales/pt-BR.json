@@ -176,6 +176,8 @@
     "waitingChanges": "Aguardando mudanças",
     "autoSyncActive": "Auto-sync ativo",
     "sync": "Sincronizar",
+    "upload": "Enviar",
+    "download": "Baixar",
     "loadingCloud": "Carregando dados da nuvem...",
     "clearData": "Limpar Dados",
     "clearDataDesc": "Remove todas as transações, investimentos e configurações de cards. Esta ação não pode ser desfeita.",

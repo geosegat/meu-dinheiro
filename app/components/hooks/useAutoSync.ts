@@ -18,10 +18,22 @@ function applyCloudData(data: Record<string, unknown>) {
     localStorage.setItem('exchange_rates', JSON.stringify(data.exchange_rates));
 }
 
+function getLocalData() {
+  return {
+    transactions: JSON.parse(localStorage.getItem('finance_transactions') || '[]'),
+    investments: JSON.parse(localStorage.getItem('finance_investments') || '[]'),
+    dashboard_cards: JSON.parse(localStorage.getItem('dashboard_cards') || '[]'),
+    locale: localStorage.getItem('app_locale') || 'pt-BR',
+    currency: localStorage.getItem('app_currency') || 'BRL',
+    exchange_rates: JSON.parse(localStorage.getItem('exchange_rates') || '{}'),
+  };
+}
+
 interface UseAutoSyncReturn {
   isSyncing: boolean;
   lastSyncTime: Date | null;
-  syncNow: () => Promise<void>;
+  upload: () => Promise<void>;
+  download: () => Promise<void>;
   error: string | null;
 }
 
@@ -34,9 +46,8 @@ export function useAutoSync(): UseAutoSyncReturn {
   const lastKnownCloudSync = useRef<string | null>(null);
   const isSyncingRef = useRef(false);
 
-  const lastLocalChange = useRef<number>(0);
-
-  const syncNow = useCallback(async () => {
+  // Envia dados locais para a nuvem
+  const upload = useCallback(async () => {
     if (!session?.user?.email || isSyncingRef.current) return;
 
     try {
@@ -44,60 +55,19 @@ export function useAutoSync(): UseAutoSyncReturn {
       setIsSyncing(true);
       setError(null);
 
-      // 1. Primeiro puxa da nuvem para ver se tem dados mais novos
-      const getResponse = await fetch('/api/sync');
-      if (getResponse.ok) {
-        const { data: cloudData, lastSync } = await getResponse.json();
-
-        if (cloudData && lastSync) {
-          const localTransactions = localStorage.getItem('finance_transactions') || '[]';
-          const localInvestments = localStorage.getItem('finance_investments') || '[]';
-          const cloudTransactions = JSON.stringify(cloudData.transactions || []);
-          const cloudInvestments = JSON.stringify(cloudData.investments || []);
-
-          const cloudIsNewer = lastKnownCloudSync.current !== lastSync;
-          const localIsDifferent =
-            localTransactions !== cloudTransactions || localInvestments !== cloudInvestments;
-
-          if (cloudIsNewer && localIsDifferent && lastLocalChange.current === 0) {
-            // Nuvem tem dados diferentes e não houve mudança local recente -> puxar
-            applyCloudData(cloudData);
-            lastKnownCloudSync.current = lastSync;
-            setLastSyncTime(new Date());
-            window.dispatchEvent(
-              new CustomEvent('localStorageChange', { detail: { key: 'poll_update' } })
-            );
-            return;
-          }
-        }
-      }
-
-      // 2. Upload dos dados locais (houve mudança local ou nuvem está desatualizada)
-      const data = {
-        transactions: JSON.parse(localStorage.getItem('finance_transactions') || '[]'),
-        investments: JSON.parse(localStorage.getItem('finance_investments') || '[]'),
-        dashboard_cards: JSON.parse(localStorage.getItem('dashboard_cards') || '[]'),
-        locale: localStorage.getItem('app_locale') || 'pt-BR',
-        currency: localStorage.getItem('app_currency') || 'BRL',
-        exchange_rates: JSON.parse(localStorage.getItem('exchange_rates') || '{}'),
-      };
-
       const response = await fetch('/api/sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data }),
+        body: JSON.stringify({ data: getLocalData() }),
       });
 
-      if (!response.ok) throw new Error('Erro ao sincronizar dados');
+      if (!response.ok) throw new Error('Erro ao enviar dados');
 
       const result = await response.json();
-      if (result.lastSync) {
-        lastKnownCloudSync.current = result.lastSync;
-      }
-      lastLocalChange.current = 0;
+      if (result.lastSync) lastKnownCloudSync.current = result.lastSync;
       setLastSyncTime(new Date());
     } catch (err) {
-      console.error('Erro na sincronização:', err);
+      console.error('Erro no upload:', err);
       setError(err instanceof Error ? err.message : 'Erro desconhecido');
     } finally {
       isSyncingRef.current = false;
@@ -105,18 +75,45 @@ export function useAutoSync(): UseAutoSyncReturn {
     }
   }, [session]);
 
-  // Listener para mudanças locais -> upload com debounce de 2s
+  // Puxa dados da nuvem e aplica localmente
+  const download = useCallback(async () => {
+    if (!session?.user?.email || isSyncingRef.current) return;
+
+    try {
+      isSyncingRef.current = true;
+      setIsSyncing(true);
+      setError(null);
+
+      const response = await fetch('/api/sync');
+      if (!response.ok) throw new Error('Erro ao baixar dados');
+
+      const { data, lastSync } = await response.json();
+
+      if (data) {
+        applyCloudData(data);
+        if (lastSync) lastKnownCloudSync.current = lastSync;
+        setLastSyncTime(new Date());
+        window.dispatchEvent(
+          new CustomEvent('localStorageChange', { detail: { key: 'poll_update' } })
+        );
+      }
+    } catch (err) {
+      console.error('Erro no download:', err);
+      setError(err instanceof Error ? err.message : 'Erro desconhecido');
+    } finally {
+      isSyncingRef.current = false;
+      setIsSyncing(false);
+    }
+  }, [session]);
+
+  // Auto-upload quando localStorage muda (debounce 2s)
   useEffect(() => {
     const handleStorageChange = (e: Event) => {
       const detail = (e as CustomEvent).detail;
-      // Ignora eventos do próprio polling para não criar loop
       if (detail?.key === 'poll_update') return;
 
-      // Marca que houve mudança local
-      lastLocalChange.current = Date.now();
-
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-      debounceTimerRef.current = setTimeout(() => syncNow(), 2000);
+      debounceTimerRef.current = setTimeout(() => upload(), 2000);
     };
 
     window.addEventListener('localStorageChange', handleStorageChange);
@@ -124,7 +121,7 @@ export function useAutoSync(): UseAutoSyncReturn {
       window.removeEventListener('localStorageChange', handleStorageChange);
       if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
     };
-  }, [syncNow]);
+  }, [upload]);
 
   // Polling: a cada 10s checa se a nuvem tem dados mais novos
   useEffect(() => {
@@ -138,15 +135,10 @@ export function useAutoSync(): UseAutoSyncReturn {
         if (!response.ok) return;
 
         const { data, lastSync } = await response.json();
-
         if (!lastSync || !data) return;
 
-        // Se o timestamp da nuvem é mais novo que o que conhecemos, aplicar
-        if (lastKnownCloudSync.current && lastSync === lastKnownCloudSync.current) {
-          return; // Nada mudou
-        }
+        if (lastKnownCloudSync.current && lastSync === lastKnownCloudSync.current) return;
 
-        // Checa se os dados são realmente diferentes
         const localTransactions = localStorage.getItem('finance_transactions') || '[]';
         const localInvestments = localStorage.getItem('finance_investments') || '[]';
         const cloudTransactions = JSON.stringify(data.transactions || []);
@@ -156,13 +148,14 @@ export function useAutoSync(): UseAutoSyncReturn {
           applyCloudData(data);
           lastKnownCloudSync.current = lastSync;
           setLastSyncTime(new Date());
-          // Dispara evento para que componentes React re-leiam do localStorage
-          window.dispatchEvent(new CustomEvent('localStorageChange', { detail: { key: 'poll_update' } }));
+          window.dispatchEvent(
+            new CustomEvent('localStorageChange', { detail: { key: 'poll_update' } })
+          );
         } else {
           lastKnownCloudSync.current = lastSync;
         }
       } catch {
-        // Silencioso - polling não deve mostrar erro
+        // Silencioso
       }
     };
 
@@ -170,5 +163,5 @@ export function useAutoSync(): UseAutoSyncReturn {
     return () => clearInterval(interval);
   }, [session]);
 
-  return { isSyncing, lastSyncTime, syncNow, error };
+  return { isSyncing, lastSyncTime, upload, download, error };
 }
