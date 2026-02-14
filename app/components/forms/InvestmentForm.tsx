@@ -125,7 +125,7 @@ export default function InvestmentForm({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
-          <div className="space-y-4 sm:space-y-5 px-4 sm:px-6 py-4 overflow-y-auto flex-1">
+          <div className="space-y-5 sm:space-y-5 px-4 sm:px-6 py-6 sm:py-4 overflow-y-auto flex-1 overscroll-contain">
             <div>
               <Label htmlFor="nome" className="text-xs sm:text-sm font-medium text-gray-700 mb-2">
                 {t('forms.investmentName')}

@@ -121,12 +121,12 @@ export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickA
           <DialogTitle className="text-lg sm:text-xl font-bold">{title}</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4 sm:space-y-6 px-4 sm:px-6 py-4 overflow-y-auto flex-1">
+        <div className="space-y-5 sm:space-y-6 px-4 sm:px-6 py-6 sm:py-4 overflow-y-auto flex-1 overscroll-contain">
           <div>
             <p className="text-xs sm:text-sm font-medium text-gray-700 mb-2 sm:mb-3">
               {t('forms.category')}
             </p>
-            <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+            <div className="grid grid-cols-3 gap-2 sm:gap-2.5">
               {templates.map((template) => (
                 <motion.button
                   key={template.key}
@@ -134,7 +134,7 @@ export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickA
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setSelectedCategory(template)}
-                  className={`p-2 sm:p-3 rounded-lg sm:rounded-xl border-2 transition-all ${
+                  className={`p-2.5 sm:p-3 rounded-lg sm:rounded-xl border-2 transition-all ${
                     selectedCategory?.key === template.key
                       ? 'border-gray-900 bg-gray-50'
                       : 'border-gray-100 hover:border-gray-200'

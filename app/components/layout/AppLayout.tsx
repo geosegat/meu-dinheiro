@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -10,9 +11,9 @@ import {
   TrendingDown,
   Menu,
   X,
-  Wallet,
   PiggyBank,
   Settings,
+  Tags,
 } from 'lucide-react';
 import { useTranslation } from '@/app/i18n/useTranslation';
 
@@ -21,6 +22,7 @@ const navItems = [
   { key: 'income', icon: TrendingUp, href: '/rendas' },
   { key: 'expenses', icon: TrendingDown, href: '/gastos' },
   { key: 'investments', icon: PiggyBank, href: '/investimentos' },
+  { key: 'categories', icon: Tags, href: '/categorias' },
   { key: 'settings', icon: Settings, href: '/configuracoes' },
 ];
 
@@ -36,11 +38,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
   return (
     <div className="min-h-screen bg-gray-50/50">
       <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-100 z-40 flex items-center justify-between px-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-linear-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-600/20">
-            <Wallet className="w-5 h-5 text-white" />
-          </div>
-          <span className="font-bold text-gray-900">MeuDinheiro</span>
+        <div className="flex items-center">
+          <Image src="/images/logo3.png" alt="MeuDinheiro" width={56} height={56} />
+          <span className="font-bold" style={{ color: '#1B5E20' }}>
+            MeuDinheiro
+          </span>
         </div>
         <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-lg hover:bg-gray-100">
           <Menu className="w-6 h-6 text-gray-700" />
@@ -65,11 +67,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
               className="lg:hidden fixed left-0 top-0 bottom-0 w-72 bg-white z-50 shadow-2xl flex flex-col"
             >
               <div className="p-4 flex items-center justify-between border-b border-gray-100">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-linear-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
-                    <Wallet className="w-5 h-5 text-white" />
-                  </div>
-                  <span className="font-bold text-gray-900">MeuDinheiro</span>
+                <div className="flex items-center">
+                  <Image src="/images/logo3.png" alt="MeuDinheiro" width={40} height={40} />
+                  <span className="font-bold" style={{ color: '#1B5E20' }}>
+                    MeuDinheiro
+                  </span>
                 </div>
                 <button
                   onClick={() => setSidebarOpen(false)}
@@ -103,12 +105,13 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
       <div className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white border-r border-gray-100 z-30 flex-col">
         <div className="p-6 flex-1">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-12 h-12 rounded-xl bg-linear-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-600/20">
-              <Wallet className="w-6 h-6 text-white" />
-            </div>
+          <div className="flex items-center mb-8">
+            <Image src="/images/logo3.png" alt="MeuDinheiro" width={56} height={56} />
+
             <div>
-              <h1 className="font-bold text-gray-900">MeuDinheiro</h1>
+              <h1 className="font-bold" style={{ color: '#1B5E20' }}>
+                MeuDinheiro
+              </h1>
               <p className="text-xs text-gray-500">{t('nav.personalFinance')}</p>
             </div>
           </div>

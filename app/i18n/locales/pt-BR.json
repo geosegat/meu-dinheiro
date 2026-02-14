@@ -4,6 +4,7 @@
     "income": "Rendas",
     "expenses": "Gastos",
     "investments": "Investimentos",
+    "categories": "Categorias",
     "settings": "Configurações",
     "personalFinance": "Finanças Pessoais"
   },
@@ -198,6 +199,43 @@
     "useCloudDataDesc": "Substitui os dados locais pelos dados salvos na sua conta Google",
     "useLocalData": "Usar dados deste dispositivo",
     "useLocalDataDesc": "Mantém os dados locais e envia para a nuvem"
+  },
+  "categories": {
+    "title": "Categorias",
+    "subtitle": "Gerencie suas categorias personalizadas",
+    "expenses": "Gastos",
+    "incomes": "Rendas",
+    "addNew": "Nova Categoria",
+    "addCategory": "Adicionar Categoria",
+    "editCategory": "Editar Categoria",
+    "defaultCategories": "Categorias Padrão",
+    "customCategories": "Categorias Personalizadas",
+    "selectEmoji": "Selecionar Emoji",
+    "searchEmoji": "Buscar emoji...",
+    "icon": "Ícone",
+    "name": "Nome",
+    "namePlaceholder": "Ex: Academia, Streaming...",
+    "color": "Cor",
+    "expense": {
+      "food": "Alimentação",
+      "transport": "Transporte",
+      "health": "Saúde",
+      "education": "Educação",
+      "entertainment": "Lazer",
+      "shopping": "Compras",
+      "bills": "Contas",
+      "other": "Outros"
+    },
+    "income": {
+      "salary": "Salário",
+      "freelance": "Freelance",
+      "investment": "Investimento",
+      "gift": "Presente",
+      "bonus": "Bônus",
+      "refund": "Reembolso",
+      "sale": "Venda",
+      "other": "Outros"
+    }
   },
   "cards": {
     "customize": "Personalizar Cards",
