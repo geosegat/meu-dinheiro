@@ -116,81 +116,91 @@ export default function InvestmentForm({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-bold flex items-center gap-2">
+      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-hidden flex flex-col p-0">
+        <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-0">
+          <DialogTitle className="text-lg sm:text-xl font-bold flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-blue-600" />
             {editingInvestment ? t('investments.editInvestment') : t('investments.newInvestment')}
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-5 pt-4">
-          <div>
-            <Label htmlFor="nome" className="text-sm font-medium text-gray-700 mb-2">
-              {t('forms.investmentName')}
-            </Label>
-            <Input
-              id="nome"
-              type="text"
-              placeholder={t('forms.investmentNamePlaceholder')}
-              value={formData.nome}
-              onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-              className="mt-1"
-            />
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+          <div className="space-y-4 sm:space-y-5 px-4 sm:px-6 py-4 overflow-y-auto flex-1">
+            <div>
+              <Label htmlFor="nome" className="text-xs sm:text-sm font-medium text-gray-700 mb-2">
+                {t('forms.investmentName')}
+              </Label>
+              <Input
+                id="nome"
+                type="text"
+                placeholder={t('forms.investmentNamePlaceholder')}
+                value={formData.nome}
+                onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
+                className="mt-1 h-10 sm:h-auto"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="valor" className="text-xs sm:text-sm font-medium text-gray-700 mb-2">
+                {t('forms.investedValue')}
+              </Label>
+              <Input
+                id="valor"
+                type="text"
+                inputMode="numeric"
+                placeholder={locale === 'pt-BR' ? '0,00' : '0.00'}
+                value={formatDisplayAmount(formData.valor_inicial)}
+                onChange={(e) => handleValueChange(e.target.value)}
+                className="mt-1 text-base sm:text-lg font-semibold h-10 sm:h-auto"
+              />
+            </div>
+
+            <div>
+              <Label
+                htmlFor="percentual"
+                className="text-xs sm:text-sm font-medium text-gray-700 mb-2"
+              >
+                {t('forms.cdiPercentage')}
+              </Label>
+              <Input
+                id="percentual"
+                type="number"
+                step="0.01"
+                placeholder="100"
+                value={formData.percentual_cdi}
+                onChange={(e) => setFormData({ ...formData, percentual_cdi: e.target.value })}
+                className="mt-1 h-10 sm:h-auto"
+              />
+              <p className="text-[10px] sm:text-xs text-gray-500 mt-1.5">{t('forms.cdiExample')}</p>
+            </div>
+
+            <div>
+              <Label htmlFor="data" className="text-xs sm:text-sm font-medium text-gray-700 mb-2">
+                {t('forms.startDate')}
+              </Label>
+              <Input
+                id="data"
+                type="date"
+                value={formData.data_inicio}
+                onChange={(e) => setFormData({ ...formData, data_inicio: e.target.value })}
+                className="mt-1 h-10 sm:h-auto"
+              />
+            </div>
           </div>
 
-          <div>
-            <Label htmlFor="valor" className="text-sm font-medium text-gray-700 mb-2">
-              {t('forms.investedValue')}
-            </Label>
-            <Input
-              id="valor"
-              type="text"
-              inputMode="numeric"
-              placeholder={locale === 'pt-BR' ? '0,00' : '0.00'}
-              value={formatDisplayAmount(formData.valor_inicial)}
-              onChange={(e) => handleValueChange(e.target.value)}
-              className="mt-1 text-lg font-semibold"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="percentual" className="text-sm font-medium text-gray-700 mb-2">
-              {t('forms.cdiPercentage')}
-            </Label>
-            <Input
-              id="percentual"
-              type="number"
-              step="0.01"
-              placeholder="100"
-              value={formData.percentual_cdi}
-              onChange={(e) => setFormData({ ...formData, percentual_cdi: e.target.value })}
-              className="mt-1"
-            />
-            <p className="text-xs text-gray-500 mt-1">{t('forms.cdiExample')}</p>
-          </div>
-
-          <div>
-            <Label htmlFor="data" className="text-sm font-medium text-gray-700 mb-2">
-              {t('forms.startDate')}
-            </Label>
-            <Input
-              id="data"
-              type="date"
-              value={formData.data_inicio}
-              onChange={(e) => setFormData({ ...formData, data_inicio: e.target.value })}
-              className="mt-1"
-            />
-          </div>
-
-          <div className="flex gap-3 pt-2">
-            <Button type="button" variant="outline" onClick={handleClose} className="flex-1">
+          <div className="flex gap-3 px-4 sm:px-6 pb-4 sm:pb-6 pt-2 border-t border-gray-100 shrink-0">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleClose}
+              className="flex-1 h-10 sm:h-auto"
+            >
               {t('forms.cancel')}
             </Button>
             <Button
               type="submit"
               disabled={!formData.nome || !formData.valor_inicial}
-              className="flex-1 bg-blue-600 hover:bg-blue-700"
+              className="flex-1 bg-blue-600 hover:bg-blue-700 h-10 sm:h-auto"
             >
               {editingInvestment ? t('forms.update') : t('forms.add')}
             </Button>

@@ -68,11 +68,11 @@ export default function CardSelector({ selectedCards, onSave }: CardSelectorProp
       <Button
         onClick={handleOpen}
         variant="outline"
-        className="gap-2 w-full sm:w-auto"
+        className="gap-2 col-span-2 sm:col-span-1 sm:w-auto justify-center"
         size="default"
       >
-        <Settings className="w-4 h-4" />
-        <span className="hidden sm:inline">{t('cards.customize')}</span>
+        <Settings className="w-4 h-4\" />
+        <span>{t('cards.customize')}</span>
       </Button>
 
       <AnimatePresence>
@@ -136,11 +136,7 @@ export default function CardSelector({ selectedCards, onSave }: CardSelectorProp
                             if (!cardInfo) return null;
 
                             return (
-                              <Reorder.Item
-                                key={cardType}
-                                value={cardType}
-                                className="relative"
-                              >
+                              <Reorder.Item key={cardType} value={cardType} className="relative">
                                 <div className="flex items-center gap-2 p-3 sm:p-4 bg-blue-50 border-2 border-blue-200 rounded-xl">
                                   <GripVertical className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400 cursor-grab active:cursor-grabbing shrink-0" />
                                   <div className="flex-1 min-w-0">
@@ -221,8 +217,8 @@ export default function CardSelector({ selectedCards, onSave }: CardSelectorProp
                                 isSelected
                                   ? 'border-blue-200 bg-blue-50/50 opacity-50 cursor-not-allowed'
                                   : canSelect
-                                  ? 'border-gray-200 hover:border-blue-300 hover:bg-blue-50 bg-white'
-                                  : 'border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed'
+                                    ? 'border-gray-200 hover:border-blue-300 hover:bg-blue-50 bg-white'
+                                    : 'border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed'
                               }`}
                             >
                               {isSelected && (
@@ -252,7 +248,11 @@ export default function CardSelector({ selectedCards, onSave }: CardSelectorProp
                       : t('cards.selectMore', { count: 4 - tempSelected.length })}
                   </p>
                   <div className="flex gap-2 sm:gap-3">
-                    <Button onClick={handleCancel} variant="outline" className="flex-1 sm:flex-none">
+                    <Button
+                      onClick={handleCancel}
+                      variant="outline"
+                      className="flex-1 sm:flex-none"
+                    >
                       {t('forms.cancel')}
                     </Button>
                     <Button

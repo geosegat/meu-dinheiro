@@ -116,15 +116,17 @@ export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickA
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-bold">{title}</DialogTitle>
+      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-hidden flex flex-col p-0">
+        <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-0">
+          <DialogTitle className="text-lg sm:text-xl font-bold">{title}</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6 pt-4">
+        <div className="space-y-4 sm:space-y-6 px-4 sm:px-6 py-4 overflow-y-auto flex-1">
           <div>
-            <p className="text-sm font-medium text-gray-700 mb-3">{t('forms.category')}</p>
-            <div className="grid grid-cols-3 gap-2">
+            <p className="text-xs sm:text-sm font-medium text-gray-700 mb-2 sm:mb-3">
+              {t('forms.category')}
+            </p>
+            <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
               {templates.map((template) => (
                 <motion.button
                   key={template.key}
@@ -132,14 +134,14 @@ export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickA
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setSelectedCategory(template)}
-                  className={`p-3 rounded-xl border-2 transition-all ${
+                  className={`p-2 sm:p-3 rounded-lg sm:rounded-xl border-2 transition-all ${
                     selectedCategory?.key === template.key
                       ? 'border-gray-900 bg-gray-50'
                       : 'border-gray-100 hover:border-gray-200'
                   }`}
                 >
-                  <div className="text-2xl mb-1">{template.icon}</div>
-                  <p className="text-xs font-medium text-gray-700 truncate">
+                  <div className="text-xl sm:text-2xl mb-0.5 sm:mb-1">{template.icon}</div>
+                  <p className="text-[10px] sm:text-xs font-medium text-gray-700 truncate leading-tight">
                     {t(`categories.${type}.${template.key}`)}
                   </p>
                 </motion.button>
@@ -148,59 +150,64 @@ export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickA
           </div>
 
           <div>
-            <p className="text-sm font-medium text-gray-700 mb-2">{t('forms.amount')}</p>
+            <p className="text-xs sm:text-sm font-medium text-gray-700 mb-2">{t('forms.amount')}</p>
             <Input
               type="text"
               inputMode="numeric"
               placeholder={locale === 'pt-BR' ? '0,00' : '0.00'}
               value={formatDisplayAmount(amount)}
               onChange={(e) => handleAmountChange(e.target.value)}
-              className="text-2xl font-bold h-14 text-center"
+              className="text-xl sm:text-2xl font-bold h-12 sm:h-14 text-center"
             />
           </div>
 
           <div>
-            <p className="text-sm font-medium text-gray-700 mb-2">{t('forms.description')}</p>
+            <p className="text-xs sm:text-sm font-medium text-gray-700 mb-2">
+              {t('forms.description')}
+            </p>
             <Input
               type="text"
               placeholder={t('forms.descriptionPlaceholder')}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              className="h-10 sm:h-auto"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-2">{t('forms.date')}</p>
+              <p className="text-xs sm:text-sm font-medium text-gray-700 mb-2">{t('forms.date')}</p>
               <Input
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="h-12"
+                className="h-10 sm:h-12"
               />
             </div>
 
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-2">{t('forms.time')}</p>
+              <p className="text-xs sm:text-sm font-medium text-gray-700 mb-2">{t('forms.time')}</p>
               <Input
                 type="time"
                 value={time}
                 onChange={(e) => setTime(e.target.value)}
-                className="h-12"
+                className="h-10 sm:h-12"
               />
             </div>
           </div>
+        </div>
 
+        <div className="px-4 sm:px-6 pb-4 sm:pb-6 pt-2 border-t border-gray-100 shrink-0">
           <Button
             onClick={handleSubmit}
             disabled={!selectedCategory || !amount}
-            className={`w-full h-12 text-base font-semibold ${
+            className={`w-full h-11 sm:h-12 text-sm sm:text-base font-semibold ${
               type === 'expense'
                 ? 'bg-rose-600 hover:bg-rose-700'
                 : 'bg-emerald-600 hover:bg-emerald-700'
             }`}
           >
-            <Plus className="w-5 h-5 mr-2" />
+            <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
             {t(type === 'expense' ? 'forms.addExpense' : 'forms.addIncome')}
           </Button>
         </div>
