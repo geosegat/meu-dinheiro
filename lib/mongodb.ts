@@ -5,6 +5,8 @@ const uri = process.env.MONGODB_URI;
 const options = {
   connectTimeoutMS: 10000,
   serverSelectionTimeoutMS: 10000,
+  tls: true,
+  tlsAllowInvalidCertificates: false,
 };
 
 let cachedClient: MongoClient | null = null;
