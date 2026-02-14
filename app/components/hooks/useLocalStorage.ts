@@ -9,6 +9,8 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
       setStoredValue(valueToStore);
       if (typeof window !== 'undefined') {
         window.localStorage.setItem(key, JSON.stringify(valueToStore));
+        // Dispara evento customizado para notificar mudanças no localStorage
+        window.dispatchEvent(new CustomEvent('localStorageChange', { detail: { key } }));
       }
     } catch (error) {
       console.log(error);

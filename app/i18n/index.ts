@@ -1,7 +1,8 @@
 import ptBR from './locales/pt-BR.json';
 import enUS from './locales/en-US.json';
+import esES from './locales/es-ES.json';
 
-export const locales = { 'pt-BR': ptBR, 'en-US': enUS } as const;
+export const locales = { 'pt-BR': ptBR, 'en-US': enUS, 'es-ES': esES } as const;
 export type Locale = keyof typeof locales;
 export const defaultLocale: Locale = 'pt-BR';
 

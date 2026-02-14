@@ -1,0 +1,233 @@
+{
+  "nav": {
+    "dashboard": "Panel",
+    "income": "Ingresos",
+    "expenses": "Gastos",
+    "investments": "Inversiones",
+    "settings": "Configuración",
+    "personalFinance": "Finanzas Personales"
+  },
+  "dashboard": {
+    "title": "Panel",
+    "subtitle": "Resumen de tus finanzas",
+    "newIncome": "Nuevo Ingreso",
+    "newExpense": "Nuevo Gasto",
+    "newIncomeShort": "Ingreso",
+    "newExpenseShort": "Gasto",
+    "period": "Período:",
+    "currentBalance": "Saldo Actual",
+    "totalIncome": "Total de Ingresos",
+    "totalExpenses": "Total de Gastos",
+    "dailyYield": "Rendimiento Diario",
+    "perMonth": "/mes",
+    "futureIncome": "por recibir",
+    "futureExpense": "por pagar",
+    "recentTransactions": "Transacciones Recientes",
+    "noTransactions": "Aún no hay transacciones",
+    "clickToAdd": "Haz clic en los botones arriba para agregar"
+  },
+  "periods": {
+    "month": "Este Mes",
+    "3months": "Últimos 3 Meses",
+    "6months": "Últimos 6 Meses",
+    "year": "Este Año",
+    "all": "Todo"
+  },
+  "months": {
+    "all": "Todos los meses",
+    "allShort": "Todos",
+    "0": "Enero",
+    "1": "Febrero",
+    "2": "Marzo",
+    "3": "Abril",
+    "4": "Mayo",
+    "5": "Junio",
+    "6": "Julio",
+    "7": "Agosto",
+    "8": "Septiembre",
+    "9": "Octubre",
+    "10": "Noviembre",
+    "11": "Diciembre"
+  },
+  "expenses": {
+    "title": "Gastos",
+    "subtitle": "Controla tus gastos",
+    "newExpense": "Nuevo Gasto",
+    "totalExpenses": "Total de Gastos",
+    "quickAdd": "Agregar Rápido",
+    "history": "Historial de Gastos",
+    "noExpenses": "No hay gastos registrados",
+    "clickToAdd": "Haz clic en \"Nuevo Gasto\" para agregar",
+    "allCategories": "Todas las categorías",
+    "byCategory": "Gastos por Categoría",
+    "addToSeeChart": "Agrega gastos para ver el gráfico",
+    "transactions": "transacciones"
+  },
+  "income": {
+    "title": "Ingresos",
+    "subtitle": "Administra tus fuentes de ingreso",
+    "newIncome": "Nuevo Ingreso",
+    "totalIncome": "Total de Ingresos",
+    "history": "Historial de Ingresos",
+    "noIncome": "No hay ingresos registrados",
+    "clickToAdd": "Haz clic en \"Nuevo Ingreso\" para agregar",
+    "transactions": "transacciones"
+  },
+  "investments": {
+    "title": "Inversiones",
+    "subtitle": "Sigue tus rendimientos",
+    "newInvestment": "Nueva Inversión",
+    "editInvestment": "Editar Inversión",
+    "howItWorks": "¿Cómo funciona el cálculo?",
+    "howItWorksDesc": "Los rendimientos se calculan según la tasa CDI actual (~13,65% anual) multiplicada por el porcentaje de tu inversión. El impuesto sobre la renta se descuenta automáticamente siguiendo la tabla regresiva: 22,5% (hasta 180 días), 20% (181-360), 17,5% (361-720) y 15% (más de 720 días).",
+    "totalInvested": "Total Invertido",
+    "netYield": "Rendimiento Neto",
+    "totalBalance": "Saldo Total",
+    "dailyYield": "Rendimiento Diario",
+    "noInvestments": "No hay inversiones registradas",
+    "addToTrack": "Agrega tus inversiones para seguir los rendimientos",
+    "addFirst": "Agregar Primera Inversión",
+    "confirmDelete": "¿Seguro que deseas eliminar esta inversión?",
+    "daysInvested": "días invertidos",
+    "investedAmount": "Monto Invertido",
+    "currentBalance": "Saldo Actual",
+    "dailyReturn": "Retorno diario",
+    "grossReturn": "Retorno bruto",
+    "netReturn": "Retorno neto",
+    "perMonth": "/mes"
+  },
+  "forms": {
+    "newExpense": "Nuevo Gasto",
+    "newIncome": "Nuevo Ingreso",
+    "category": "Categoría",
+    "amount": "Monto",
+    "description": "Descripción (opcional)",
+    "descriptionPlaceholder": "ej. Almuerzo en restaurante",
+    "date": "Fecha",
+    "time": "Hora",
+    "addExpense": "Agregar Gasto",
+    "addIncome": "Agregar Ingreso",
+    "investmentName": "Nombre de la Inversión",
+    "investmentNamePlaceholder": "ej. Bonos, CDB",
+    "investedValue": "Monto Invertido",
+    "cdiPercentage": "Porcentaje del CDI (%)",
+    "cdiExample": "ej. 100% CDI, 102% CDI, 110% CDI",
+    "startDate": "Fecha de Inicio",
+    "cancel": "Cancelar",
+    "update": "Actualizar",
+    "add": "Agregar",
+    "save": "Guardar"
+  },
+  "charts": {
+    "summary": "Resumen",
+    "addTransactions": "Agrega transacciones",
+    "income": "Ingresos",
+    "expenses": "Gastos",
+    "balance": "Saldo",
+    "categories": "categorías",
+    "total": "Total:"
+  },
+  "transaction": {
+    "at": "a las"
+  },
+  "categories": {
+    "expense": {
+      "food": "Alimentación",
+      "transport": "Transporte",
+      "housing": "Vivienda",
+      "health": "Salud",
+      "leisure": "Ocio",
+      "education": "Educación",
+      "shopping": "Compras",
+      "streaming": "Streaming",
+      "internet": "Internet",
+      "phone": "Celular",
+      "subscriptions": "Suscripciones",
+      "other": "Otros"
+    },
+    "income": {
+      "salary": "Salario",
+      "freelance": "Freelance",
+      "investments": "Inversiones",
+      "rent": "Alquiler",
+      "other": "Otros"
+    }
+  },
+  "settings": {
+    "title": "Configuración",
+    "subtitle": "Personaliza tu experiencia y gestiona tus datos",
+    "preferences": "Preferencias",
+    "language": "Idioma",
+    "currency": "Moneda",
+    "ratesUpdated": "Tasas actualizadas en",
+    "ratesError": "Error al cargar tasas",
+    "refreshRates": "Actualizar tasas",
+    "loading": "Cargando...",
+    "backupTitle": "Copia de Seguridad y Restauración",
+    "backupDescription": "Exporta tus datos para respaldarlos o transferirlos a otro dispositivo",
+    "exportData": "Exportar Datos",
+    "exportDescription": "Descarga todos tus datos en formato JSON",
+    "export": "Exportar",
+    "exportSuccess": "¡Datos exportados con éxito!",
+    "exportError": "Error al exportar datos",
+    "importData": "Importar Datos",
+    "importDescription": "Restaura tus datos desde una copia anterior",
+    "import": "Importar",
+    "importSuccess": "¡Datos importados! Recargando...",
+    "importError": "Error al importar datos. Verifica el archivo.",
+    "backupWarning": "⚠️ La importación reemplazará todos los datos actuales. ¡Haz un respaldo antes!"
+  },
+  "cards": {
+    "customize": "Personalizar Tarjetas",
+    "customizeTitle": "Personalizar Panel",
+    "customizeSubtitle": "Elige 4 tarjetas para mostrar",
+    "maxSelected": "Máximo de 4 tarjetas seleccionadas",
+    "selectMore": "Selecciona {{count}} tarjeta(s) más",
+    "selectedCards": "Tarjetas Seleccionadas",
+    "availableCards": "Tarjetas Disponibles",
+    "noCardsSelected": "Aún no hay tarjetas seleccionadas",
+    "dragToReorder": "Arrastra para reordenar o usa las flechas",
+    "save": "Guardar",
+    "currentBalance": {
+      "title": "Saldo Actual",
+      "description": "Tu saldo disponible ahora"
+    },
+    "totalIncome": {
+      "title": "Total de Ingresos",
+      "description": "Ingresos del período seleccionado"
+    },
+    "totalExpenses": {
+      "title": "Total de Gastos",
+      "description": "Gastos del período seleccionado"
+    },
+    "monthlyExpenses": {
+      "title": "Gastos del Mes",
+      "description": "Comparación con el mes anterior"
+    },
+    "investments": {
+      "title": "Inversiones",
+      "description": "Saldo total de inversiones",
+      "invested": "invertido"
+    },
+    "topCategory": {
+      "title": "Mayor Categoría",
+      "description": "Categoría con más gastos",
+      "noData": "Sin datos"
+    },
+    "savingsRate": {
+      "title": "% Ahorrado",
+      "description": "Porcentaje del ingreso ahorrado",
+      "saved": "ahorrado"
+    },
+    "pendingPayments": {
+      "title": "Pendientes",
+      "description": "Cuentas y gastos futuros",
+      "transactions": "pendientes",
+      "noData": "Sin pendientes"
+    },
+    "dailyYield": {
+      "title": "Rendimiento Diario",
+      "description": "Rendimiento de inversiones"
+    }
+  }
+}

@@ -2,11 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import {
-  Wallet,
-  ArrowUpRight,
-  ArrowDownRight,
-} from 'lucide-react';
+import { Wallet, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocalStorage } from '../app/components/hooks/useLocalStorage';
 import TransactionItem from '../app/components/finance/TransactionItem';
@@ -68,8 +64,8 @@ export default function DashboardPage() {
   const filteredTransactions = getFilteredTransactions();
 
   const now = new Date();
-  now.setHours(23, 59, 59, 999); 
-  
+  now.setHours(23, 59, 59, 999);
+
   const pastTransactions = filteredTransactions.filter((tx) => {
     const txDate = new Date(tx.date);
     return txDate <= now;
@@ -79,14 +75,6 @@ export default function DashboardPage() {
     const txDate = new Date(tx.date);
     return txDate > now;
   });
-
-  const totalIncome = filteredTransactions
-    .filter((tx) => tx.type === 'income')
-    .reduce((sum, tx) => sum + tx.amount, 0);
-
-  const totalExpenses = filteredTransactions
-    .filter((tx) => tx.type === 'expense')
-    .reduce((sum, tx) => sum + tx.amount, 0);
 
   const futureIncome = futureTransactions
     .filter((tx) => tx.type === 'income')
@@ -99,7 +87,6 @@ export default function DashboardPage() {
   const currentBalance = pastTransactions.reduce((sum, tx) => {
     return tx.type === 'income' ? sum + tx.amount : sum - tx.amount;
   }, 0);
-
 
   const recentTransactions = [...transactions]
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
