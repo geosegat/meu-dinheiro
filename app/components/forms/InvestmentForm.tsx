@@ -30,11 +30,21 @@ export default function InvestmentForm({
   editingInvestment,
 }: InvestmentFormProps) {
   const { t, locale } = useTranslation();
+
+  // Get current date in local timezone
+  const getCurrentDate = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const [formData, setFormData] = useState<FormData>({
     nome: '',
     valor_inicial: '',
     percentual_cdi: '100',
-    data_inicio: new Date().toISOString().split('T')[0],
+    data_inicio: getCurrentDate(),
   });
 
   useEffect(() => {
@@ -70,7 +80,7 @@ export default function InvestmentForm({
       nome: '',
       valor_inicial: '',
       percentual_cdi: '100',
-      data_inicio: new Date().toISOString().split('T')[0],
+      data_inicio: getCurrentDate(),
     });
     onOpenChange(false);
   };
@@ -80,11 +90,15 @@ export default function InvestmentForm({
 
   const handleValueChange = (value: string) => {
     // Remove thousands separators, keep only digits and decimal separator
-    let raw = value.replace(new RegExp(`\\${thousandsSep}`, 'g'), '').replace(new RegExp(`[^\\d${decimalSep === ',' ? ',' : '.'}]`, 'g'), '');
+    let raw = value
+      .replace(new RegExp(`\\${thousandsSep}`, 'g'), '')
+      .replace(new RegExp(`[^\\d${decimalSep === ',' ? ',' : '.'}]`, 'g'), '');
     // Only allow one decimal separator
     const sepIndex = raw.indexOf(decimalSep);
     if (sepIndex !== -1) {
-      raw = raw.slice(0, sepIndex + 1) + raw.slice(sepIndex + 1).replace(new RegExp(`\\${decimalSep}`, 'g'), '');
+      raw =
+        raw.slice(0, sepIndex + 1) +
+        raw.slice(sepIndex + 1).replace(new RegExp(`\\${decimalSep}`, 'g'), '');
     }
     // Limit decimal to 2 places
     const parts = raw.split(decimalSep);

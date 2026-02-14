@@ -23,9 +23,12 @@ export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickA
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
 
-  // Initialize with current date and time
+  // Initialize with current date and time (local timezone)
   const now = new Date();
-  const currentDate = now.toISOString().split('T')[0]; // YYYY-MM-DD
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const currentDate = `${year}-${month}-${day}`; // YYYY-MM-DD
   const currentTime = now.toTimeString().slice(0, 5); // HH:MM
 
   const [date, setDate] = useState(currentDate);
@@ -57,7 +60,10 @@ export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickA
 
     // Reset to current date/time
     const resetNow = new Date();
-    setDate(resetNow.toISOString().split('T')[0]);
+    const resetYear = resetNow.getFullYear();
+    const resetMonth = String(resetNow.getMonth() + 1).padStart(2, '0');
+    const resetDay = String(resetNow.getDate()).padStart(2, '0');
+    setDate(`${resetYear}-${resetMonth}-${resetDay}`);
     setTime(resetNow.toTimeString().slice(0, 5));
 
     onOpenChange(false);
@@ -70,7 +76,10 @@ export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickA
 
     // Reset to current date/time
     const resetNow = new Date();
-    setDate(resetNow.toISOString().split('T')[0]);
+    const resetYear = resetNow.getFullYear();
+    const resetMonth = String(resetNow.getMonth() + 1).padStart(2, '0');
+    const resetDay = String(resetNow.getDate()).padStart(2, '0');
+    setDate(`${resetYear}-${resetMonth}-${resetDay}`);
     setTime(resetNow.toTimeString().slice(0, 5));
 
     onOpenChange(false);
@@ -81,11 +90,15 @@ export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickA
 
   const handleAmountChange = (value: string) => {
     // Remove thousands separators, keep only digits and decimal separator
-    let raw = value.replace(new RegExp(`\\${thousandsSep}`, 'g'), '').replace(new RegExp(`[^\\d${decimalSep === ',' ? ',' : '.'}]`, 'g'), '');
+    let raw = value
+      .replace(new RegExp(`\\${thousandsSep}`, 'g'), '')
+      .replace(new RegExp(`[^\\d${decimalSep === ',' ? ',' : '.'}]`, 'g'), '');
     // Only allow one decimal separator
     const sepIndex = raw.indexOf(decimalSep);
     if (sepIndex !== -1) {
-      raw = raw.slice(0, sepIndex + 1) + raw.slice(sepIndex + 1).replace(new RegExp(`\\${decimalSep}`, 'g'), '');
+      raw =
+        raw.slice(0, sepIndex + 1) +
+        raw.slice(sepIndex + 1).replace(new RegExp(`\\${decimalSep}`, 'g'), '');
     }
     // Limit decimal to 2 places
     const parts = raw.split(decimalSep);
@@ -126,7 +139,9 @@ export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickA
                   }`}
                 >
                   <div className="text-2xl mb-1">{template.icon}</div>
-                  <p className="text-xs font-medium text-gray-700 truncate">{t(`categories.${type}.${template.key}`)}</p>
+                  <p className="text-xs font-medium text-gray-700 truncate">
+                    {t(`categories.${type}.${template.key}`)}
+                  </p>
                 </motion.button>
               ))}
             </div>

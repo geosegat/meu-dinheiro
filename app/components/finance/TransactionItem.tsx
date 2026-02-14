@@ -37,22 +37,29 @@ export default function TransactionItem({ transaction, onDelete, index }: Transa
         </div>
         <div>
           <p className="font-semibold text-gray-900">
-            {transaction.description || t(`categories.${transaction.type === 'expense' ? 'expense' : 'income'}.${transaction.category}`)}
+            {transaction.description ||
+              t(
+                `categories.${transaction.type === 'expense' ? 'expense' : 'income'}.${transaction.category}`
+              )}
           </p>
           <p className="text-sm text-gray-500">
-            {t(`categories.${transaction.type === 'expense' ? 'expense' : 'income'}.${transaction.category}`)} • {formatDate(transaction.date)} {t('transaction.at')} {formatTime(transaction.date)}
+            {t(
+              `categories.${transaction.type === 'expense' ? 'expense' : 'income'}.${transaction.category}`
+            )}{' '}
+            • {formatDate(transaction.date)} {t('transaction.at')} {formatTime(transaction.date)}
           </p>
         </div>
       </div>
       <div className="flex items-center gap-4">
         <p className={`text-lg font-bold ${isExpense ? 'text-rose-600' : 'text-emerald-600'}`}>
-          {isExpense ? '- ' : '+ '}{formatCurrency(transaction.amount)}
+          {isExpense ? '- ' : '+ '}
+          {formatCurrency(transaction.amount)}
         </p>
         <Button
           variant="ghost"
           size="icon"
           onClick={() => onDelete(transaction.id)}
-          className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-rose-500 hover:bg-rose-50"
+          className="text-gray-400 hover:text-rose-500 hover:bg-rose-50 transition-colors"
         >
           <Trash2 className="w-4 h-4" />
         </Button>
