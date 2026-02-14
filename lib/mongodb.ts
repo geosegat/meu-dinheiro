@@ -1,42 +1,29 @@
 import { MongoClient, Db } from 'mongodb';
 
-const options = {};
+const uri = process.env.MONGODB_URI;
 
-let client: MongoClient;
-let clientPromise: Promise<MongoClient> | null = null;
+const options = {
+  connectTimeoutMS: 10000,
+  serverSelectionTimeoutMS: 10000,
+};
 
-function getClientPromise(): Promise<MongoClient> {
-  if (clientPromise) return clientPromise;
+let cachedClient: MongoClient | null = null;
+let cachedDb: Db | null = null;
 
-  const uri = process.env.MONGODB_URI;
-  if (!uri) {
-    throw new Error('Por favor, adicione MONGODB_URI no arquivo .env.local');
-  }
-
-  if (process.env.NODE_ENV === 'development') {
-    // Em desenvolvimento, usa uma variável global para preservar o client entre hot reloads
-    const globalWithMongo = global as typeof globalThis & {
-      _mongoClientPromise?: Promise<MongoClient>;
-    };
-
-    if (!globalWithMongo._mongoClientPromise) {
-      client = new MongoClient(uri, options);
-      globalWithMongo._mongoClientPromise = client.connect();
-    }
-    clientPromise = globalWithMongo._mongoClientPromise;
-  } else {
-    // Em produção, cria uma nova conexão
-    client = new MongoClient(uri, options);
-    clientPromise = client.connect();
-  }
-
-  return clientPromise;
-}
-
-// Helper para obter o database
 export async function getDatabase(): Promise<Db> {
-  const client = await getClientPromise();
-  return client.db('meu-dinheiro');
-}
+  if (cachedDb && cachedClient) {
+    return cachedDb;
+  }
 
-export default getClientPromise;
+  if (!uri) {
+    throw new Error('Por favor, adicione MONGODB_URI nas variáveis de ambiente');
+  }
+
+  const client = new MongoClient(uri, options);
+  await client.connect();
+
+  cachedClient = client;
+  cachedDb = client.db('meu-dinheiro');
+
+  return cachedDb;
+}

@@ -19,8 +19,9 @@ export async function GET() {
 
     return NextResponse.json({ data: user.data }, { status: 200 });
   } catch (error) {
-    console.error('Erro ao buscar dados:', error);
-    return NextResponse.json({ error: 'Erro ao buscar dados' }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Erro desconhecido';
+    console.error('Erro ao buscar dados:', message);
+    return NextResponse.json({ error: 'Erro ao buscar dados', message }, { status: 500 });
   }
 }
 
@@ -60,7 +61,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, lastSync: new Date() }, { status: 200 });
   } catch (error) {
-    console.error('Erro ao salvar dados:', error);
-    return NextResponse.json({ error: 'Erro ao salvar dados' }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Erro desconhecido';
+    console.error('Erro ao salvar dados:', message);
+    return NextResponse.json({ error: 'Erro ao salvar dados', message }, { status: 500 });
   }
 }
