@@ -14,10 +14,10 @@ export async function GET() {
     const user = await db.collection('users').findOne({ email: session.user.email });
 
     if (!user || !user.data) {
-      return NextResponse.json({ data: null }, { status: 200 });
+      return NextResponse.json({ data: null, lastSync: null }, { status: 200 });
     }
 
-    return NextResponse.json({ data: user.data }, { status: 200 });
+    return NextResponse.json({ data: user.data, lastSync: user.lastSync || null }, { status: 200 });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erro desconhecido';
     console.error('Erro ao buscar dados:', message);

@@ -26,6 +26,22 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
     } catch (error) {
       console.log(error);
     }
+
+    // Re-lê quando outro dispositivo atualiza via polling
+    const handleExternalChange = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail?.key === 'poll_update' || detail?.key === key) {
+        try {
+          const item = window.localStorage.getItem(key);
+          if (item) setStoredValue(JSON.parse(item));
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    };
+
+    window.addEventListener('localStorageChange', handleExternalChange);
+    return () => window.removeEventListener('localStorageChange', handleExternalChange);
   }, [key]);
 
   return [storedValue, setValue] as const;

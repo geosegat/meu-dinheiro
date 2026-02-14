@@ -221,7 +221,7 @@ export default function ConfiguracoesPage() {
               </Button>
             ) : (
               <div className="space-y-4">
-                <div className="flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-200">
+                <div className="flex flex-wrap items-center gap-4 p-4 bg-white rounded-xl border border-gray-200">
                   {session.user?.image && (
                     <img
                       src={session.user.image}
@@ -229,15 +229,15 @@ export default function ConfiguracoesPage() {
                       className="w-12 h-12 rounded-full"
                     />
                   )}
-                  <div className="flex-1">
-                    <p className="font-semibold text-gray-900">{session.user?.name}</p>
-                    <p className="text-sm text-gray-600">{session.user?.email}</p>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-gray-900 truncate">{session.user?.name}</p>
+                    <p className="text-sm text-gray-600 truncate">{session.user?.email}</p>
                   </div>
                   <Button
                     onClick={() => handleSignOut()}
                     variant="outline"
                     size="sm"
-                    className="gap-2"
+                    className="gap-2 shrink-0"
                   >
                     <LogOut className="w-4 h-4" />
                     {t('settings.signOut')}
