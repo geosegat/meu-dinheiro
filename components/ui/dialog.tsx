@@ -52,7 +52,7 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          'bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-bottom-[8px] data-[state=open]:slide-in-from-bottom-[8px] sm:data-[state=closed]:zoom-out-95 sm:data-[state=open]:zoom-in-95 fixed bottom-0 sm:top-[50%] left-0 right-0 sm:left-[50%] z-50 grid w-full max-w-full sm:translate-x-[-50%] sm:translate-y-[-50%] gap-4 rounded-t-2xl sm:rounded-lg border-t sm:border border-gray-200 p-6 shadow-lg duration-200 outline-none sm:max-w-lg',
+          'bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-bottom-full data-[state=open]:slide-in-from-bottom-full sm:data-[state=closed]:slide-out-to-bottom-[0px] sm:data-[state=open]:slide-in-from-bottom-[0px] sm:data-[state=closed]:zoom-out-90 sm:data-[state=open]:zoom-in-90 fixed bottom-0 sm:top-[50%] left-0 right-0 sm:left-[50%] z-50 grid w-full max-w-full sm:translate-x-[-50%] sm:translate-y-[-50%] gap-4 rounded-t-2xl sm:rounded-lg border-t sm:border border-gray-200 p-6 shadow-lg duration-300 sm:duration-200 ease-out outline-none sm:max-w-lg',
           className
         )}
         {...props}
