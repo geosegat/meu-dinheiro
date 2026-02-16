@@ -62,8 +62,6 @@ export default function DynamicCard({
     );
   });
 
-  const pastTransactions = transactions.filter((tx) => new Date(tx.date) <= now);
-
   const totalIncome = currentMonthTransactions
     .filter((tx) => tx.type === 'income')
     .reduce((sum, tx) => sum + tx.amount, 0);
@@ -279,7 +277,6 @@ export default function DynamicCard({
         );
         dailyBudget = currentBalance / daysRemaining;
       } else {
-        // Sem próxima renda, calcula pelo resto do mês
         const today = new Date();
         const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
         daysRemaining = Math.max(1, lastDayOfMonth - today.getDate() + 1);
