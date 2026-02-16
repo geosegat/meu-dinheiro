@@ -108,6 +108,8 @@
     "time": "Hora",
     "addExpense": "Adicionar Gasto",
     "addIncome": "Adicionar Renda",
+    "editExpense": "Editar Gasto",
+    "editIncome": "Editar Renda",
     "investmentName": "Nome do Investimento",
     "investmentNamePlaceholder": "ex. Tesouro Direto, CDB",
     "investedValue": "Valor Investido",
@@ -274,6 +276,12 @@
     "dailyYield": {
       "title": "Rendimento Diário",
       "description": "Rendimento dos investimentos"
+    },
+    "dailyBudget": {
+      "title": "Gasto Diário",
+      "description": "Quanto pode gastar por dia até a próxima renda",
+      "daysUntilIncome": "dias até próxima renda",
+      "daysLeft": "dias restantes no mês"
     }
   }
 }

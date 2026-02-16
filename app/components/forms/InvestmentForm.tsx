@@ -116,7 +116,7 @@ export default function InvestmentForm({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-hidden flex flex-col p-0">
+      <DialogContent className="sm:max-w-lg max-h-[90vh] sm:max-h-[95vh] sm:min-h-[70vh] overflow-hidden flex flex-col p-0">
         <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-0">
           <DialogTitle className="text-lg sm:text-xl font-bold flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-blue-600" />

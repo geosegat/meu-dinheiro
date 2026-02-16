@@ -1,24 +1,33 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus } from 'lucide-react';
+import { Plus, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { expenseCategories, incomeCategories, useLocalStorage } from '../hooks/useLocalStorage';
 import { Transaction, Template } from '@/types/finance';
 import { useTranslation } from '@/app/i18n/useTranslation';
-import { getCategoryDisplayName } from '../hooks/useCategories';
+import { getCategoryDisplayName, findCategoryTemplate } from '../hooks/useCategories';
 
 interface QuickAddFormProps {
   type: 'expense' | 'income';
   onAdd: (transaction: Transaction) => void;
+  onEdit?: (transaction: Transaction) => void;
+  editTransaction?: Transaction | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickAddFormProps) {
+export default function QuickAddForm({
+  type,
+  onAdd,
+  onEdit,
+  editTransaction,
+  open,
+  onOpenChange,
+}: QuickAddFormProps) {
   const { t, locale } = useTranslation();
   const [selectedCategory, setSelectedCategory] = useState<Template | null>(null);
   const [amount, setAmount] = useState('');
@@ -43,7 +52,32 @@ export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickA
   const hidden = type === 'expense' ? hiddenExpense : hiddenIncome;
   const custom = type === 'expense' ? customExpense : customIncome;
   const templates = [...defaultTemplates.filter((c) => !hidden.includes(c.key)), ...custom];
-  const title = type === 'expense' ? t('forms.newExpense') : t('forms.newIncome');
+
+  const isEditing = !!editTransaction;
+  const title = isEditing
+    ? t(type === 'expense' ? 'forms.editExpense' : 'forms.editIncome')
+    : type === 'expense'
+      ? t('forms.newExpense')
+      : t('forms.newIncome');
+
+  // Pre-fill form when editing
+  useEffect(() => {
+    if (editTransaction && open) {
+      const catTemplate =
+        findCategoryTemplate(editTransaction.category, type) ||
+        templates.find((t) => t.key === editTransaction.category) ||
+        null;
+      setSelectedCategory(catTemplate);
+      setAmount(String(editTransaction.amount));
+      setDescription(editTransaction.description || '');
+      const editDate = new Date(editTransaction.date);
+      const ey = editDate.getFullYear();
+      const em = String(editDate.getMonth() + 1).padStart(2, '0');
+      const ed = String(editDate.getDate()).padStart(2, '0');
+      setDate(`${ey}-${em}-${ed}`);
+      setTime(editDate.toTimeString().slice(0, 5));
+    }
+  }, [editTransaction, open]);
 
   const handleSubmit = () => {
     if (!selectedCategory || !amount) return;
@@ -52,14 +86,20 @@ export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickA
     const dateTimeString = `${date}T${time}:00`;
     const selectedDateTime = new Date(dateTimeString);
 
-    onAdd({
-      id: Date.now(),
+    const transaction: Transaction = {
+      id: isEditing ? editTransaction!.id : Date.now(),
       type,
       category: selectedCategory.key,
       amount: parseFloat(amount),
       description,
       date: selectedDateTime.toISOString(),
-    });
+    };
+
+    if (isEditing && onEdit) {
+      onEdit(transaction);
+    } else {
+      onAdd(transaction);
+    }
 
     // Reset form
     setSelectedCategory(null);
@@ -124,7 +164,7 @@ export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickA
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-hidden flex flex-col p-0">
+      <DialogContent className="sm:max-w-lg max-h-[90vh] sm:max-h-[95vh] sm:min-h-[70vh] overflow-hidden flex flex-col p-0">
         <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-0">
           <DialogTitle className="text-lg sm:text-xl font-bold">{title}</DialogTitle>
         </DialogHeader>
@@ -215,8 +255,14 @@ export default function QuickAddForm({ type, onAdd, open, onOpenChange }: QuickA
                 : 'bg-emerald-600 hover:bg-emerald-700'
             }`}
           >
-            <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-            {t(type === 'expense' ? 'forms.addExpense' : 'forms.addIncome')}
+            {isEditing ? (
+              <Check className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+            ) : (
+              <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+            )}
+            {isEditing
+              ? t('forms.save')
+              : t(type === 'expense' ? 'forms.addExpense' : 'forms.addIncome')}
           </Button>
         </div>
       </DialogContent>

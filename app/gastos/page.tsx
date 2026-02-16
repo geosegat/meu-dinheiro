@@ -18,7 +18,8 @@ export default function GastosPage() {
     []
   );
   const [showForm, setShowForm] = useState(false);
-  const [selectedMonth, setSelectedMonth] = useState('all');
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState(String(new Date().getMonth()));
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [hiddenExpense] = useLocalStorage<string[]>('hidden_expense_categories', []);
   const [customExpense] = useLocalStorage<{ key: string; icon: string; color: string }[]>(
@@ -52,6 +53,15 @@ export default function GastosPage() {
 
   const handleDeleteTransaction = (id: number) => {
     setTransactions(transactions.filter((tx) => tx.id !== id));
+  };
+
+  const handleEditTransaction = (transaction: Transaction) => {
+    setTransactions(transactions.map((tx) => (tx.id === transaction.id ? transaction : tx)));
+  };
+
+  const handleStartEdit = (transaction: Transaction) => {
+    setEditingTransaction(transaction);
+    setShowForm(true);
   };
 
   const months = [
@@ -228,6 +238,7 @@ export default function GastosPage() {
                       key={transaction.id}
                       transaction={transaction}
                       onDelete={handleDeleteTransaction}
+                      onEdit={handleStartEdit}
                       index={index}
                     />
                   ))}
@@ -240,8 +251,13 @@ export default function GastosPage() {
         <QuickAddForm
           type="expense"
           onAdd={handleAddTransaction}
+          onEdit={handleEditTransaction}
+          editTransaction={editingTransaction}
           open={showForm}
-          onOpenChange={setShowForm}
+          onOpenChange={(open) => {
+            setShowForm(open);
+            if (!open) setEditingTransaction(null);
+          }}
         />
       </div>
     </AppLayout>

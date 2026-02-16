@@ -108,6 +108,8 @@
     "time": "Hora",
     "addExpense": "Agregar Gasto",
     "addIncome": "Agregar Ingreso",
+    "editExpense": "Editar Gasto",
+    "editIncome": "Editar Ingreso",
     "investmentName": "Nombre de la Inversión",
     "investmentNamePlaceholder": "ej. Bonos, CDB",
     "investedValue": "Monto Invertido",
@@ -274,6 +276,12 @@
     "dailyYield": {
       "title": "Rendimiento Diario",
       "description": "Rendimiento de inversiones"
+    },
+    "dailyBudget": {
+      "title": "Gasto Diario",
+      "description": "Cuánto puedes gastar por día hasta el próximo ingreso",
+      "daysUntilIncome": "días hasta próximo ingreso",
+      "daysLeft": "días restantes del mes"
     }
   }
 }

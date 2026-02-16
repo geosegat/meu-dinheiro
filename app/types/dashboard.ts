@@ -1,4 +1,4 @@
-export type DashboardCardType = 
+export type DashboardCardType =
   | 'current-balance'
   | 'total-income'
   | 'total-expenses'
@@ -7,7 +7,8 @@ export type DashboardCardType =
   | 'top-category'
   | 'savings-rate'
   | 'pending-payments'
-  | 'daily-yield';
+  | 'daily-yield'
+  | 'daily-budget';
 
 export interface DashboardCardConfig {
   id: string;
@@ -71,5 +72,10 @@ export const AVAILABLE_CARDS: Array<{
     type: 'daily-yield',
     labelKey: 'cards.dailyYield.title',
     descriptionKey: 'cards.dailyYield.description',
+  },
+  {
+    type: 'daily-budget',
+    labelKey: 'cards.dailyBudget.title',
+    descriptionKey: 'cards.dailyBudget.description',
   },
 ];

@@ -10,6 +10,7 @@ import {
   Target,
   Clock,
   Crown,
+  HandCoins,
 } from 'lucide-react';
 import StatCard from '../layout/StatCard';
 import { DashboardCardType } from '@/app/types/dashboard';
@@ -22,6 +23,7 @@ import { findCategoryTemplate, getCategoryDisplayName } from '../hooks/useCatego
 interface DynamicCardProps {
   type: DashboardCardType;
   transactions: Transaction[];
+  allTransactions: Transaction[];
   investments: Investment[];
   currentBalance: number;
   futureIncome: number;
@@ -32,6 +34,7 @@ interface DynamicCardProps {
 export default function DynamicCard({
   type,
   transactions,
+  allTransactions,
   investments,
   currentBalance,
   futureIncome,
@@ -255,6 +258,50 @@ export default function DynamicCard({
           delay={delay}
         />
       );
+
+    case 'daily-budget': {
+      const futureIncomes = allTransactions
+        .filter((tx) => tx.type === 'income' && new Date(tx.date) > now)
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+      const nextIncome = futureIncomes[0];
+      let daysRemaining = 0;
+      let dailyBudget = 0;
+
+      if (nextIncome) {
+        const nextIncomeDate = new Date(nextIncome.date);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        nextIncomeDate.setHours(0, 0, 0, 0);
+        daysRemaining = Math.max(
+          1,
+          Math.ceil((nextIncomeDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+        );
+        dailyBudget = currentBalance / daysRemaining;
+      } else {
+        // Sem próxima renda, calcula pelo resto do mês
+        const today = new Date();
+        const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+        daysRemaining = Math.max(1, lastDayOfMonth - today.getDate() + 1);
+        dailyBudget = currentBalance / daysRemaining;
+      }
+
+      return (
+        <StatCard
+          title={t('cards.dailyBudget.title')}
+          value={formatCurrency(Math.max(0, dailyBudget))}
+          icon={HandCoins}
+          color={dailyBudget > 0 ? 'green' : 'red'}
+          trend={
+            nextIncome
+              ? `${daysRemaining} ${t('cards.dailyBudget.daysUntilIncome')}`
+              : `${daysRemaining} ${t('cards.dailyBudget.daysLeft')}`
+          }
+          trendUp={dailyBudget > 0}
+          delay={delay}
+        />
+      );
+    }
 
     default:
       return null;

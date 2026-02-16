@@ -12,10 +12,16 @@ import { useTranslation } from '@/app/i18n/useTranslation';
 interface TransactionItemProps {
   transaction: Transaction;
   onDelete: (id: number) => void;
+  onEdit?: (transaction: Transaction) => void;
   index: number;
 }
 
-export default function TransactionItem({ transaction, onDelete, index }: TransactionItemProps) {
+export default function TransactionItem({
+  transaction,
+  onDelete,
+  onEdit,
+  index,
+}: TransactionItemProps) {
   const { t, formatCurrency, formatDate, formatTime } = useTranslation();
   const isExpense = transaction.type === 'expense';
   const catType = isExpense ? 'expense' : 'income';
@@ -30,7 +36,8 @@ export default function TransactionItem({ transaction, onDelete, index }: Transa
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 20 }}
       transition={{ duration: 0.3, delay: index * 0.05 }}
-      className="group flex items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl bg-white border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all"
+      className={`group flex items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl bg-white border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all ${onEdit ? 'cursor-pointer' : ''}`}
+      onClick={() => onEdit?.(transaction)}
     >
       {/* Icon */}
       <div
@@ -54,7 +61,10 @@ export default function TransactionItem({ transaction, onDelete, index }: Transa
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => onDelete(transaction.id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(transaction.id);
+            }}
             className="text-gray-400 hover:text-rose-500 hover:bg-rose-50 transition-colors shrink-0 h-8 w-8 sm:h-10 sm:w-10"
           >
             <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />

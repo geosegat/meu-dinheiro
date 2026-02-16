@@ -108,6 +108,8 @@
     "time": "Time",
     "addExpense": "Add Expense",
     "addIncome": "Add Income",
+    "editExpense": "Edit Expense",
+    "editIncome": "Edit Income",
     "investmentName": "Investment Name",
     "investmentNamePlaceholder": "e.g. Treasury, Bank CD",
     "investedValue": "Invested Amount",
@@ -274,6 +276,12 @@
     "dailyYield": {
       "title": "Daily Yield",
       "description": "Investment returns"
+    },
+    "dailyBudget": {
+      "title": "Daily Budget",
+      "description": "How much you can spend per day until next income",
+      "daysUntilIncome": "days until next income",
+      "daysLeft": "days left in the month"
     }
   }
 }

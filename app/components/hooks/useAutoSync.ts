@@ -1,9 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useSession } from 'next-auth/react';
-
-const POLL_INTERVAL = 10000; // 10 segundos
 
 function applyCloudData(data: Record<string, unknown>) {
   if (data.transactions)
@@ -67,8 +65,6 @@ export function useAutoSync(): UseAutoSyncReturn {
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const lastKnownCloudSync = useRef<string | null>(null);
   const isSyncingRef = useRef(false);
 
   // Envia dados locais para a nuvem
@@ -88,8 +84,6 @@ export function useAutoSync(): UseAutoSyncReturn {
 
       if (!response.ok) throw new Error('Erro ao enviar dados');
 
-      const result = await response.json();
-      if (result.lastSync) lastKnownCloudSync.current = result.lastSync;
       setLastSyncTime(new Date());
     } catch (err) {
       console.error('Erro no upload:', err);
@@ -116,7 +110,6 @@ export function useAutoSync(): UseAutoSyncReturn {
 
       if (data) {
         applyCloudData(data);
-        if (lastSync) lastKnownCloudSync.current = lastSync;
         setLastSyncTime(new Date());
         window.dispatchEvent(
           new CustomEvent('localStorageChange', { detail: { key: 'poll_update' } })
@@ -129,63 +122,6 @@ export function useAutoSync(): UseAutoSyncReturn {
       isSyncingRef.current = false;
       setIsSyncing(false);
     }
-  }, [session]);
-
-  // Auto-upload quando localStorage muda (debounce 2s)
-  useEffect(() => {
-    const handleStorageChange = (e: Event) => {
-      const detail = (e as CustomEvent).detail;
-      if (detail?.key === 'poll_update') return;
-
-      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-      debounceTimerRef.current = setTimeout(() => upload(), 2000);
-    };
-
-    window.addEventListener('localStorageChange', handleStorageChange);
-    return () => {
-      window.removeEventListener('localStorageChange', handleStorageChange);
-      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-    };
-  }, [upload]);
-
-  // Polling: a cada 10s checa se a nuvem tem dados mais novos
-  useEffect(() => {
-    if (!session?.user?.email) return;
-
-    const pollForUpdates = async () => {
-      if (isSyncingRef.current) return;
-
-      try {
-        const response = await fetch('/api/sync');
-        if (!response.ok) return;
-
-        const { data, lastSync } = await response.json();
-        if (!lastSync || !data) return;
-
-        if (lastKnownCloudSync.current && lastSync === lastKnownCloudSync.current) return;
-
-        const localTransactions = localStorage.getItem('finance_transactions') || '[]';
-        const localInvestments = localStorage.getItem('finance_investments') || '[]';
-        const cloudTransactions = JSON.stringify(data.transactions || []);
-        const cloudInvestments = JSON.stringify(data.investments || []);
-
-        if (localTransactions !== cloudTransactions || localInvestments !== cloudInvestments) {
-          applyCloudData(data);
-          lastKnownCloudSync.current = lastSync;
-          setLastSyncTime(new Date());
-          window.dispatchEvent(
-            new CustomEvent('localStorageChange', { detail: { key: 'poll_update' } })
-          );
-        } else {
-          lastKnownCloudSync.current = lastSync;
-        }
-      } catch {
-        // Silencioso
-      }
-    };
-
-    const interval = setInterval(pollForUpdates, POLL_INTERVAL);
-    return () => clearInterval(interval);
   }, [session]);
 
   return { isSyncing, lastSyncTime, upload, download, error };

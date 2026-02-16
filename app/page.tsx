@@ -28,6 +28,7 @@ export default function DashboardPage() {
   );
   const [showExpenseForm, setShowExpenseForm] = useState(false);
   const [showIncomeForm, setShowIncomeForm] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [selectedPeriod, setSelectedPeriod] = useState('month');
   const { t } = useTranslation();
 
@@ -44,11 +45,11 @@ export default function DashboardPage() {
       month: (date) => date.getMonth() === currentMonth && date.getFullYear() === currentYear,
       '3months': (date) => {
         const diffDays = Math.ceil((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
-        return diffDays <= 90;
+        return diffDays >= 0 && diffDays <= 90;
       },
       '6months': (date) => {
         const diffDays = Math.ceil((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
-        return diffDays <= 180;
+        return diffDays >= 0 && diffDays <= 180;
       },
       year: (date) => date.getFullYear() === currentYear,
       all: () => true,
@@ -89,6 +90,7 @@ export default function DashboardPage() {
   }, 0);
 
   const recentTransactions = [...transactions]
+    .filter((tx) => new Date(tx.date) <= now)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 5);
 
@@ -98,6 +100,19 @@ export default function DashboardPage() {
 
   const handleDeleteTransaction = (id: number) => {
     setTransactions(transactions.filter((tx) => tx.id !== id));
+  };
+
+  const handleEditTransaction = (transaction: Transaction) => {
+    setTransactions(transactions.map((tx) => (tx.id === transaction.id ? transaction : tx)));
+  };
+
+  const handleStartEdit = (transaction: Transaction) => {
+    setEditingTransaction(transaction);
+    if (transaction.type === 'expense') {
+      setShowExpenseForm(true);
+    } else {
+      setShowIncomeForm(true);
+    }
   };
 
   const periods = [
@@ -158,7 +173,7 @@ export default function DashboardPage() {
                   onClick={() => setSelectedPeriod(period.value)}
                   className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
                     selectedPeriod === period.value
-                      ? 'bg-gray-900 text-white shadow-lg shadow-gray-900/20'
+                      ? 'bg-gray-900 text-white shadow-sm'
                       : 'bg-gray-50 text-gray-600 border border-gray-200 hover:border-gray-300 hover:bg-gray-100'
                   }`}
                 >
@@ -176,6 +191,7 @@ export default function DashboardPage() {
                   key={card.id}
                   type={card.type}
                   transactions={filteredTransactions}
+                  allTransactions={transactions}
                   investments={investments}
                   currentBalance={currentBalance}
                   futureIncome={futureIncome}
@@ -218,6 +234,7 @@ export default function DashboardPage() {
                     key={transaction.id}
                     transaction={transaction}
                     onDelete={handleDeleteTransaction}
+                    onEdit={handleStartEdit}
                     index={index}
                   />
                 ))}
@@ -229,14 +246,24 @@ export default function DashboardPage() {
         <QuickAddForm
           type="expense"
           onAdd={handleAddTransaction}
+          onEdit={handleEditTransaction}
+          editTransaction={editingTransaction?.type === 'expense' ? editingTransaction : null}
           open={showExpenseForm}
-          onOpenChange={setShowExpenseForm}
+          onOpenChange={(open) => {
+            setShowExpenseForm(open);
+            if (!open) setEditingTransaction(null);
+          }}
         />
         <QuickAddForm
           type="income"
           onAdd={handleAddTransaction}
+          onEdit={handleEditTransaction}
+          editTransaction={editingTransaction?.type === 'income' ? editingTransaction : null}
           open={showIncomeForm}
-          onOpenChange={setShowIncomeForm}
+          onOpenChange={(open) => {
+            setShowIncomeForm(open);
+            if (!open) setEditingTransaction(null);
+          }}
         />
       </div>
     </AppLayout>

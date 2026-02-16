@@ -19,7 +19,8 @@ export default function RendasPage() {
     []
   );
   const [showForm, setShowForm] = useState(false);
-  const [selectedMonth, setSelectedMonth] = useState('all');
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState(String(new Date().getMonth()));
 
   const incomeTransactions = transactions
     .filter((t) => t.type === 'income')
@@ -38,6 +39,15 @@ export default function RendasPage() {
 
   const handleDeleteTransaction = (id: number) => {
     setTransactions(transactions.filter((t) => t.id !== id));
+  };
+
+  const handleEditTransaction = (transaction: Transaction) => {
+    setTransactions(transactions.map((t) => (t.id === transaction.id ? transaction : t)));
+  };
+
+  const handleStartEdit = (transaction: Transaction) => {
+    setEditingTransaction(transaction);
+    setShowForm(true);
   };
 
   const months = [
@@ -166,6 +176,7 @@ export default function RendasPage() {
                       key={transaction.id}
                       transaction={transaction}
                       onDelete={handleDeleteTransaction}
+                      onEdit={handleStartEdit}
                       index={index}
                     />
                   ))}
@@ -178,8 +189,13 @@ export default function RendasPage() {
         <QuickAddForm
           type="income"
           onAdd={handleAddTransaction}
+          onEdit={handleEditTransaction}
+          editTransaction={editingTransaction}
           open={showForm}
-          onOpenChange={setShowForm}
+          onOpenChange={(open) => {
+            setShowForm(open);
+            if (!open) setEditingTransaction(null);
+          }}
         />
       </div>
     </AppLayout>

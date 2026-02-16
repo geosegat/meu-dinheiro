@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   RefreshCw,
@@ -244,9 +245,11 @@ export default function ConfiguracoesPage() {
               <div className="space-y-4">
                 <div className="flex flex-wrap items-center gap-4 p-4 bg-white rounded-xl border border-gray-200">
                   {session.user?.image && (
-                    <img
+                    <Image
                       src={session.user.image}
                       alt={session.user.name || ''}
+                      width={48}
+                      height={48}
                       className="w-12 h-12 rounded-full"
                     />
                   )}
