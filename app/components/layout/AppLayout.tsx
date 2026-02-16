@@ -37,9 +37,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   return (
     <div className="min-h-screen bg-gray-50/50">
-      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-100 z-40 flex items-center justify-between px-4">
+      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-100 z-40 flex items-center justify-between pr-4">
         <div className="flex items-center">
-          <Image src="/images/logo3.png" alt="MeuDinheiro" width={56} height={56} />
+          <Image src="/images/logo3.png" alt="MeuDinheiro" width={72} height={72} />
           <span className="font-bold" style={{ color: '#1B5E20' }}>
             MeuDinheiro
           </span>
@@ -66,9 +66,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
               className="lg:hidden fixed left-0 top-0 bottom-0 w-72 bg-white z-50 shadow-2xl flex flex-col"
             >
-              <div className="p-4 flex items-center justify-between border-b border-gray-100">
+              <div className="py-4 pr-2 flex items-center justify-between border-b border-gray-100">
                 <div className="flex items-center">
-                  <Image src="/images/logo3.png" alt="MeuDinheiro" width={40} height={40} />
+                  <Image src="/images/logo3.png" alt="MeuDinheiro" width={72} height={72} />
                   <span className="font-bold" style={{ color: '#1B5E20' }}>
                     MeuDinheiro
                   </span>
@@ -104,9 +104,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
       </AnimatePresence>
 
       <div className="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 bg-white border-r border-gray-100 z-30 flex-col">
-        <div className="p-6 flex-1">
-          <div className="flex items-center mb-8">
-            <Image src="/images/logo3.png" alt="MeuDinheiro" width={56} height={56} />
+        <div className="py-4 flex-1">
+          <div className="flex items-center mb-4">
+            <Image src="/images/logo3.png" alt="MeuDinheiro" width={72} height={72} />
 
             <div>
               <h1 className="font-bold" style={{ color: '#1B5E20' }}>
