@@ -82,6 +82,11 @@ export default function GastosPage() {
 
   const byCategory = transactions
     .filter((tx) => tx.type === 'expense')
+    .filter((tx) => {
+      if (selectedMonth === 'all') return true;
+      const date = new Date(tx.date);
+      return date.getMonth() === parseInt(selectedMonth);
+    })
     .reduce((acc: Record<string, number>, tx) => {
       if (!acc[tx.category]) acc[tx.category] = 0;
       acc[tx.category] += tx.amount;
@@ -159,29 +164,35 @@ export default function GastosPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.25 }}
-              className="grid grid-cols-2 md:grid-cols-4 gap-4"
+              className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm"
             >
-              {Object.entries(byCategory)
-                .sort((a, b) => (b[1] as number) - (a[1] as number))
-                .slice(0, 4)
-                .map(([category, amount]) => {
-                  const template =
-                    findCategoryTemplate(category, 'expense') ||
-                    expenseCategories[expenseCategories.length - 1];
-                  return (
-                    <div key={category} className="bg-white rounded-xl p-4 border border-gray-100">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-xl">{template?.icon || '📦'}</span>
-                        <span className="text-sm font-medium text-gray-600">
-                          {getCategoryDisplayName(category, 'expense', t)}
-                        </span>
+              <h3 className="text-lg font-bold text-gray-900 mb-4">{t('expenses.topExpenses')}</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {Object.entries(byCategory)
+                  .sort((a, b) => (b[1] as number) - (a[1] as number))
+                  .slice(0, 4)
+                  .map(([category, amount]) => {
+                    const template =
+                      findCategoryTemplate(category, 'expense') ||
+                      expenseCategories[expenseCategories.length - 1];
+                    return (
+                      <div
+                        key={category}
+                        className="bg-white rounded-xl p-4 border border-gray-100"
+                      >
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-xl">{template?.icon || '📦'}</span>
+                          <span className="text-sm font-medium text-gray-600">
+                            {getCategoryDisplayName(category, 'expense', t)}
+                          </span>
+                        </div>
+                        <p className="text-lg font-bold text-gray-900">
+                          {formatCurrency(amount as number)}
+                        </p>
                       </div>
-                      <p className="text-lg font-bold text-gray-900">
-                        {formatCurrency(amount as number)}
-                      </p>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+              </div>
             </motion.div>
           )}
 

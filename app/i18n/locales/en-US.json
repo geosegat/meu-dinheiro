@@ -60,6 +60,7 @@
     "noExpenses": "No expenses recorded",
     "clickToAdd": "Click \"New Expense\" to add",
     "allCategories": "All categories",
+    "topExpenses": "Top expenses",
     "byCategory": "Expenses by Category",
     "addToSeeChart": "Add expenses to see the chart",
     "transactions": "transactions"

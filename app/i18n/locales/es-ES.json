@@ -60,6 +60,7 @@
     "noExpenses": "No hay gastos registrados",
     "clickToAdd": "Haz clic en \"Nuevo Gasto\" para agregar",
     "allCategories": "Todas las categorías",
+    "topExpenses": "Principales gastos",
     "byCategory": "Gastos por Categoría",
     "addToSeeChart": "Agrega gastos para ver el gráfico",
     "transactions": "transacciones"
