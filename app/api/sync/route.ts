@@ -2,6 +2,23 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { getDatabase } from '@/lib/mongodb';
 
+interface Snapshot {
+  savedAt: Date;
+  transactionsCount: number;
+  investmentsCount: number;
+  data: Record<string, unknown>;
+}
+
+interface UserDoc {
+  email: string;
+  name?: string | null;
+  image?: string | null;
+  data?: Record<string, unknown>;
+  lastSync?: Date;
+  createdAt?: Date;
+  snapshots?: Snapshot[];
+}
+
 export async function GET() {
   try {
     const session = await auth();
@@ -11,13 +28,12 @@ export async function GET() {
     }
 
     const db = await getDatabase();
-    const user = await db.collection('users').findOne({ email: session.user.email });
+    const user = await db.collection<UserDoc>('users').findOne({ email: session.user.email });
 
     if (!user || !user.data) {
       return NextResponse.json({ data: null, lastSync: null, snapshots: [] }, { status: 200 });
     }
 
-    // Return snapshot metadata only (no full data) for the list view
     const snapshots = (
       (user.snapshots || []) as Array<{
         savedAt: Date;
@@ -30,7 +46,7 @@ export async function GET() {
         transactionsCount: s.transactionsCount,
         investmentsCount: s.investmentsCount,
       }))
-      .reverse(); // most recent first
+      .reverse();
 
     return NextResponse.json(
       { data: user.data, lastSync: user.lastSync || null, snapshots },
@@ -54,24 +70,23 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const db = await getDatabase();
 
-    // --- Rollback to a previous snapshot ---
     if (body.rollbackTo) {
-      const user = await db.collection('users').findOne({ email: session.user.email });
+      const user = await db.collection<UserDoc>('users').findOne({ email: session.user.email });
 
       if (!user || !user.snapshots) {
         return NextResponse.json({ error: 'Snapshot não encontrado' }, { status: 404 });
       }
 
-      const snapshot = (
-        user.snapshots as Array<{ savedAt: Date; data: Record<string, unknown> }>
-      ).find((s) => new Date(s.savedAt).toISOString() === body.rollbackTo);
+      const snapshot = (user.snapshots ?? []).find(
+        (s) => new Date(s.savedAt).toISOString() === body.rollbackTo
+      );
 
       if (!snapshot) {
         return NextResponse.json({ error: 'Snapshot não encontrado' }, { status: 404 });
       }
 
       await db
-        .collection('users')
+        .collection<UserDoc>('users')
         .updateOne(
           { email: session.user.email },
           { $set: { data: snapshot.data, lastSync: new Date() } }
@@ -83,7 +98,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // --- Normal upload ---
     const { data } = body;
 
     if (!data) {
@@ -97,7 +111,7 @@ export async function POST(request: NextRequest) {
       data,
     };
 
-    await db.collection('users').updateOne(
+    await db.collection<UserDoc>('users').updateOne(
       { email: session.user.email },
       {
         $set: {
@@ -110,9 +124,9 @@ export async function POST(request: NextRequest) {
         $push: {
           snapshots: {
             $each: [newSnapshot],
-            $slice: -20, // keep last 20 snapshots
+            $slice: -20,
           },
-        } as Record<string, unknown>,
+        },
         $setOnInsert: {
           createdAt: new Date(),
         },
