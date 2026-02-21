@@ -13,6 +13,7 @@ import {
   HandCoins,
 } from 'lucide-react';
 import StatCard from '../layout/StatCard';
+import DailyLimitCard from '../finance/DailyLimitCard';
 import { DashboardCardType } from '@/app/types/dashboard';
 import { Transaction, Investment } from '@/types/finance';
 import { useTranslation } from '@/app/i18n/useTranslation';
@@ -299,6 +300,9 @@ export default function DynamicCard({
         />
       );
     }
+
+    case 'daily-limit':
+      return <DailyLimitCard transactions={allTransactions} delay={delay} />;
 
     default:
       return null;

@@ -78,7 +78,6 @@ export default function CardSelector({ selectedCards, onSave }: CardSelectorProp
       <AnimatePresence>
         {isOpen && (
           <>
-            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -87,7 +86,6 @@ export default function CardSelector({ selectedCards, onSave }: CardSelectorProp
               onClick={handleCancel}
             />
 
-            {/* Modal */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -98,7 +96,6 @@ export default function CardSelector({ selectedCards, onSave }: CardSelectorProp
                 className="bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:max-w-4xl max-h-[90vh] sm:max-h-[85vh] overflow-hidden flex flex-col"
                 onClick={(e) => e.stopPropagation()}
               >
-                {/* Header */}
                 <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-100 shrink-0">
                   <div className="min-w-0 flex-1">
                     <h2 className="text-xl sm:text-2xl font-bold text-gray-900 truncate">
@@ -116,10 +113,8 @@ export default function CardSelector({ selectedCards, onSave }: CardSelectorProp
                   </button>
                 </div>
 
-                {/* Content */}
                 <div className="p-4 sm:p-6 overflow-y-auto flex-1">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                    {/* Cards Selecionados - Ordenáveis */}
                     <div>
                       <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">
                         {t('cards.selectedCards')} ({tempSelected.length}/4)
@@ -196,7 +191,6 @@ export default function CardSelector({ selectedCards, onSave }: CardSelectorProp
                       </div>
                     </div>
 
-                    {/* Cards Disponíveis */}
                     <div>
                       <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">
                         {t('cards.availableCards')}
@@ -240,7 +234,6 @@ export default function CardSelector({ selectedCards, onSave }: CardSelectorProp
                   </div>
                 </div>
 
-                {/* Footer */}
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 sm:p-6 border-t border-gray-100 shrink-0">
                   <p className="text-xs sm:text-sm text-gray-500 text-center sm:text-left">
                     {tempSelected.length === 4

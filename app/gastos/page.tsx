@@ -9,7 +9,7 @@ import { findCategoryTemplate, getCategoryDisplayName } from '../components/hook
 import TransactionItem from '../components/finance/TransactionItem';
 import QuickAddForm from '../components/forms/QuickAddForm';
 import AppLayout from '../components/layout/AppLayout';
-import { Transaction } from '@/types/finance';
+import { Transaction, Template } from '@/types/finance';
 import { useTranslation } from '@/app/i18n/useTranslation';
 
 export default function GastosPage() {
@@ -19,6 +19,7 @@ export default function GastosPage() {
   );
   const [showForm, setShowForm] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
+  const [initialCategoryForForm, setInitialCategoryForForm] = useState<Template | null>(null);
   const [selectedMonth, setSelectedMonth] = useState(String(new Date().getMonth()));
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [hiddenExpense] = useLocalStorage<string[]>('hidden_expense_categories', []);
@@ -30,6 +31,17 @@ export default function GastosPage() {
     ...expenseCategories.filter((c) => !hiddenExpense.includes(c.key)),
     ...customExpense,
   ];
+
+  const expenseUsageCount = transactions
+    .filter((tx) => tx.type === 'expense')
+    .reduce((acc: Record<string, number>, tx) => {
+      acc[tx.category] = (acc[tx.category] || 0) + 1;
+      return acc;
+    }, {});
+
+  const sortedExpenseCategories = [...visibleExpenseCategories].sort(
+    (a, b) => (expenseUsageCount[b.key] || 0) - (expenseUsageCount[a.key] || 0)
+  );
   const { t, formatCurrency } = useTranslation();
 
   const expenseTransactions = transactions
@@ -141,13 +153,16 @@ export default function GastosPage() {
           >
             <h3 className="text-lg font-bold text-gray-900 mb-4">{t('expenses.quickAdd')}</h3>
             <div className="grid grid-cols-4 md:grid-cols-6 gap-3">
-              {visibleExpenseCategories.slice(0, 6).map((template) => (
+              {sortedExpenseCategories.slice(0, 6).map((template) => (
                 <motion.button
                   key={template.key}
                   type="button"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => setShowForm(true)}
+                  onClick={() => {
+                    setInitialCategoryForForm(template);
+                    setShowForm(true);
+                  }}
                   className="p-4 rounded-xl border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all text-center"
                 >
                   <div className="text-2xl mb-2">{template.icon}</div>
@@ -264,10 +279,14 @@ export default function GastosPage() {
           onAdd={handleAddTransaction}
           onEdit={handleEditTransaction}
           editTransaction={editingTransaction}
+          initialCategory={initialCategoryForForm}
           open={showForm}
           onOpenChange={(open) => {
             setShowForm(open);
-            if (!open) setEditingTransaction(null);
+            if (!open) {
+              setEditingTransaction(null);
+              setInitialCategoryForForm(null);
+            }
           }}
         />
       </div>

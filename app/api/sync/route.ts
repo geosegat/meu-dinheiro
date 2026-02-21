@@ -14,10 +14,28 @@ export async function GET() {
     const user = await db.collection('users').findOne({ email: session.user.email });
 
     if (!user || !user.data) {
-      return NextResponse.json({ data: null, lastSync: null }, { status: 200 });
+      return NextResponse.json({ data: null, lastSync: null, snapshots: [] }, { status: 200 });
     }
 
-    return NextResponse.json({ data: user.data, lastSync: user.lastSync || null }, { status: 200 });
+    // Return snapshot metadata only (no full data) for the list view
+    const snapshots = (
+      (user.snapshots || []) as Array<{
+        savedAt: Date;
+        transactionsCount: number;
+        investmentsCount: number;
+      }>
+    )
+      .map((s) => ({
+        savedAt: s.savedAt,
+        transactionsCount: s.transactionsCount,
+        investmentsCount: s.investmentsCount,
+      }))
+      .reverse(); // most recent first
+
+    return NextResponse.json(
+      { data: user.data, lastSync: user.lastSync || null, snapshots },
+      { status: 200 }
+    );
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Erro desconhecido';
     console.error('Erro ao buscar dados:', message);
@@ -34,13 +52,50 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
+    const db = await getDatabase();
+
+    // --- Rollback to a previous snapshot ---
+    if (body.rollbackTo) {
+      const user = await db.collection('users').findOne({ email: session.user.email });
+
+      if (!user || !user.snapshots) {
+        return NextResponse.json({ error: 'Snapshot não encontrado' }, { status: 404 });
+      }
+
+      const snapshot = (
+        user.snapshots as Array<{ savedAt: Date; data: Record<string, unknown> }>
+      ).find((s) => new Date(s.savedAt).toISOString() === body.rollbackTo);
+
+      if (!snapshot) {
+        return NextResponse.json({ error: 'Snapshot não encontrado' }, { status: 404 });
+      }
+
+      await db
+        .collection('users')
+        .updateOne(
+          { email: session.user.email },
+          { $set: { data: snapshot.data, lastSync: new Date() } }
+        );
+
+      return NextResponse.json(
+        { success: true, data: snapshot.data, lastSync: new Date() },
+        { status: 200 }
+      );
+    }
+
+    // --- Normal upload ---
     const { data } = body;
 
     if (!data) {
       return NextResponse.json({ error: 'Dados inválidos' }, { status: 400 });
     }
 
-    const db = await getDatabase();
+    const newSnapshot = {
+      savedAt: new Date(),
+      transactionsCount: (data.transactions || []).length,
+      investmentsCount: (data.investments || []).length,
+      data,
+    };
 
     await db.collection('users').updateOne(
       { email: session.user.email },
@@ -49,9 +104,15 @@ export async function POST(request: NextRequest) {
           email: session.user.email,
           name: session.user.name,
           image: session.user.image,
-          data: data,
+          data,
           lastSync: new Date(),
         },
+        $push: {
+          snapshots: {
+            $each: [newSnapshot],
+            $slice: -20, // keep last 20 snapshots
+          },
+        } as Record<string, unknown>,
         $setOnInsert: {
           createdAt: new Date(),
         },

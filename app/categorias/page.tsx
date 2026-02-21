@@ -97,7 +97,7 @@ export default function CategoriasPage() {
   };
 
   const handleEditCategory = (category: CustomCategory) => {
-    if (!category.isCustom) return; // Can't edit default categories
+    if (!category.isCustom) return;
 
     setEditingCategory(category);
     setCategoryName(getCategoryName(category));
@@ -117,21 +117,17 @@ export default function CategoriasPage() {
     };
 
     if (editingCategory) {
-      // Update existing
       const updated = customCategories.map((cat) =>
         cat.key === editingCategory.key ? newCategory : cat
       );
       setCustomCategories(updated);
 
-      // Update the translation in localStorage
       const translations = JSON.parse(localStorage.getItem('category_translations') || '{}');
       translations[`${selectedType}.${newCategory.key}`] = categoryName;
       localStorage.setItem('category_translations', JSON.stringify(translations));
     } else {
-      // Add new
       setCustomCategories([...customCategories, newCategory]);
 
-      // Save translation
       const translations = JSON.parse(localStorage.getItem('category_translations') || '{}');
       translations[`${selectedType}.${newCategory.key}`] = categoryName;
       localStorage.setItem('category_translations', JSON.stringify(translations));
@@ -148,18 +144,15 @@ export default function CategoriasPage() {
       const updated = customCategories.filter((cat) => cat.key !== category.key);
       setCustomCategories(updated);
 
-      // Remove translation
       const translations = JSON.parse(localStorage.getItem('category_translations') || '{}');
       delete translations[`${selectedType}.${category.key}`];
       localStorage.setItem('category_translations', JSON.stringify(translations));
     } else {
-      // Hide default category
       setHiddenCategories([...hiddenCategories, category.key]);
     }
   };
 
   const handleReorderCategories = (newOrder: CustomCategory[]) => {
-    // Only reorder custom categories
     const reordered = newOrder.filter((cat) => cat.isCustom);
     setCustomCategories(reordered);
   };
@@ -176,7 +169,6 @@ export default function CategoriasPage() {
     <AppLayout>
       <div className="min-h-screen bg-gray-50/50 p-6 lg:p-8">
         <div className="max-w-7xl mx-auto space-y-8">
-          {/* Header */}
           <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
               {t('categories.title')}
@@ -184,7 +176,6 @@ export default function CategoriasPage() {
             <p className="text-sm sm:text-base text-gray-500 mt-1">{t('categories.subtitle')}</p>
           </motion.div>
 
-          {/* Type Selector */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -211,7 +202,6 @@ export default function CategoriasPage() {
             </Button>
           </motion.div>
 
-          {/* Categories List */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -247,7 +237,6 @@ export default function CategoriasPage() {
             </div>
           </motion.div>
 
-          {/* Custom Categories */}
           {customCategories.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -301,7 +290,6 @@ export default function CategoriasPage() {
         </div>
       </div>
 
-      {/* Add/Edit Modal */}
       <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
         <DialogContent className="sm:max-w-md max-h-[90vh] overflow-hidden flex flex-col p-0">
           <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-0 shrink-0">
@@ -311,7 +299,6 @@ export default function CategoriasPage() {
           </DialogHeader>
 
           <div className="space-y-4 px-4 sm:px-6 py-4 overflow-y-auto flex-1">
-            {/* Emoji Selector */}
             <div>
               <label className="text-xs sm:text-sm font-medium text-gray-700 mb-2 block">
                 {t('categories.icon')}
@@ -324,7 +311,6 @@ export default function CategoriasPage() {
               </button>
             </div>
 
-            {/* Name Input */}
             <div>
               <label className="text-xs sm:text-sm font-medium text-gray-700 mb-2 block">
                 {t('categories.name')}
@@ -338,7 +324,6 @@ export default function CategoriasPage() {
               />
             </div>
 
-            {/* Color Selector */}
             <div>
               <label className="text-xs sm:text-sm font-medium text-gray-700 mb-2 block">
                 {t('categories.color')}
@@ -357,7 +342,6 @@ export default function CategoriasPage() {
             </div>
           </div>
 
-          {/* Buttons */}
           <div className="flex gap-3 px-4 sm:px-6 pb-4 sm:pb-6 pt-2 border-t border-gray-100 shrink-0">
             <Button
               variant="outline"
@@ -377,7 +361,6 @@ export default function CategoriasPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Emoji Picker */}
       <EmojiPicker
         open={showEmojiPicker}
         onOpenChange={setShowEmojiPicker}

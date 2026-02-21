@@ -8,7 +8,8 @@ export type DashboardCardType =
   | 'savings-rate'
   | 'pending-payments'
   | 'daily-yield'
-  | 'daily-budget';
+  | 'daily-budget'
+  | 'daily-limit';
 
 export interface DashboardCardConfig {
   id: string;
@@ -77,5 +78,10 @@ export const AVAILABLE_CARDS: Array<{
     type: 'daily-budget',
     labelKey: 'cards.dailyBudget.title',
     descriptionKey: 'cards.dailyBudget.description',
+  },
+  {
+    type: 'daily-limit',
+    labelKey: 'cards.dailyLimit.title',
+    descriptionKey: 'cards.dailyLimit.description',
   },
 ];

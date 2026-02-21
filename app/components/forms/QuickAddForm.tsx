@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,7 @@ interface QuickAddFormProps {
   onAdd: (transaction: Transaction) => void;
   onEdit?: (transaction: Transaction) => void;
   editTransaction?: Transaction | null;
+  initialCategory?: Template | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -25,6 +26,7 @@ export default function QuickAddForm({
   onAdd,
   onEdit,
   editTransaction,
+  initialCategory,
   open,
   onOpenChange,
 }: QuickAddFormProps) {
@@ -32,6 +34,8 @@ export default function QuickAddForm({
   const [selectedCategory, setSelectedCategory] = useState<Template | null>(null);
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
+  const amountRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Initialize with current date and time (local timezone)
   const now = new Date();
@@ -49,9 +53,22 @@ export default function QuickAddForm({
   const [customIncome] = useLocalStorage<Template[]>('custom_income_categories', []);
   const [hiddenExpense] = useLocalStorage<string[]>('hidden_expense_categories', []);
   const [hiddenIncome] = useLocalStorage<string[]>('hidden_income_categories', []);
+  const [allTransactions] = useLocalStorage<Transaction[]>('finance_transactions', []);
   const hidden = type === 'expense' ? hiddenExpense : hiddenIncome;
   const custom = type === 'expense' ? customExpense : customIncome;
-  const templates = [...defaultTemplates.filter((c) => !hidden.includes(c.key)), ...custom];
+  const baseTemplates = [...defaultTemplates.filter((c) => !hidden.includes(c.key)), ...custom];
+
+  // Sort by how many times the user has used each category (most used first)
+  const usageCount = allTransactions
+    .filter((tx) => tx.type === type)
+    .reduce((acc: Record<string, number>, tx) => {
+      acc[tx.category] = (acc[tx.category] || 0) + 1;
+      return acc;
+    }, {});
+
+  const templates = [...baseTemplates].sort(
+    (a, b) => (usageCount[b.key] || 0) - (usageCount[a.key] || 0)
+  );
 
   const isEditing = !!editTransaction;
   const title = isEditing
@@ -59,6 +76,17 @@ export default function QuickAddForm({
     : type === 'expense'
       ? t('forms.newExpense')
       : t('forms.newIncome');
+
+  // Auto-select category and scroll to amount when opened with an initialCategory (quick-add tile click)
+  useEffect(() => {
+    if (open && initialCategory && !isEditing) {
+      setSelectedCategory(initialCategory);
+      setTimeout(() => {
+        amountRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        inputRef.current?.focus();
+      }, 150);
+    }
+  }, [open, initialCategory]);
 
   // Pre-fill form when editing
   useEffect(() => {
@@ -137,22 +165,25 @@ export default function QuickAddForm({
   const thousandsSep = locale === 'pt-BR' ? '.' : ',';
 
   const handleAmountChange = (value: string) => {
-    // Remove thousands separators, keep only digits and decimal separator
-    let raw = value
-      .replace(new RegExp(`\\${thousandsSep}`, 'g'), '')
-      .replace(new RegExp(`[^\\d${decimalSep === ',' ? ',' : '.'}]`, 'g'), '');
-    // Only allow one decimal separator
-    const sepIndex = raw.indexOf(decimalSep);
-    if (sepIndex !== -1) {
-      raw =
-        raw.slice(0, sepIndex + 1) +
-        raw.slice(sepIndex + 1).replace(new RegExp(`\\${decimalSep}`, 'g'), '');
+    // Accept both '.' and ',' as decimal separators (mobile keyboards may use either)
+    // Normalise to internal dot representation
+    let raw = value.replace(/[^\d.,]/g, '');
+    // If both separators are present, the last one is the decimal
+    const lastComma = raw.lastIndexOf(',');
+    const lastDot = raw.lastIndexOf('.');
+    if (lastComma > lastDot) {
+      // comma is the decimal separator — remove dots (thousands), keep comma, convert to dot
+      raw = raw.replace(/\./g, '').replace(',', '.');
+    } else {
+      // dot is the decimal separator — remove commas (thousands)
+      raw = raw.replace(/,/g, '');
     }
-    // Limit decimal to 2 places
-    const parts = raw.split(decimalSep);
+    // Only one decimal point allowed
+    const parts = raw.split('.');
+    if (parts.length > 2) return;
+    // Limit to 2 decimal places
     if (parts[1] && parts[1].length > 2) return;
-    // Store with dot for parseFloat compatibility
-    setAmount(raw.replace(decimalSep, '.'));
+    setAmount(raw);
   };
 
   const formatDisplayAmount = (value: string) => {
@@ -181,7 +212,13 @@ export default function QuickAddForm({
                   type="button"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => setSelectedCategory(template)}
+                  onClick={() => {
+                    setSelectedCategory(template);
+                    setTimeout(() => {
+                      amountRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      inputRef.current?.focus();
+                    }, 80);
+                  }}
                   className={`p-2.5 sm:p-3 rounded-lg sm:rounded-xl border-2 transition-all ${
                     selectedCategory?.key === template.key
                       ? 'border-gray-900 bg-gray-50'
@@ -197,11 +234,12 @@ export default function QuickAddForm({
             </div>
           </div>
 
-          <div>
+          <div ref={amountRef}>
             <p className="text-xs sm:text-sm font-medium text-gray-700 mb-2">{t('forms.amount')}</p>
             <Input
+              ref={inputRef}
               type="text"
-              inputMode="numeric"
+              inputMode="decimal"
               placeholder={locale === 'pt-BR' ? '0,00' : '0.00'}
               value={formatDisplayAmount(amount)}
               onChange={(e) => handleAmountChange(e.target.value)}

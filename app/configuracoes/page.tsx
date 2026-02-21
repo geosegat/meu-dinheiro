@@ -1,11 +1,10 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   RefreshCw,
-  Check,
   AlertCircle,
   Cloud,
   CloudOff,
@@ -15,6 +14,10 @@ import {
   Download,
   Upload,
   Smartphone,
+  History,
+  RotateCcw,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AppLayout from '../components/layout/AppLayout';
@@ -87,7 +90,6 @@ export default function ConfiguracoesPage() {
     useTranslation();
   const { data: session } = useSession();
   const { isSyncing, lastSyncTime, upload, download, error: syncError } = useAutoSync();
-  const [loadingFromCloud, setLoadingFromCloud] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [showConflictModal, setShowConflictModal] = useState(false);
@@ -98,12 +100,92 @@ export default function ConfiguracoesPage() {
     cloudTransactions: 0,
     cloudInvestments: 0,
   });
-  const hasCheckedCloud = useRef(false);
+
+  // Commit history
+  const [snapshots, setSnapshots] = useState<
+    Array<{ savedAt: string; transactionsCount: number; investmentsCount: number }>
+  >([]);
+  const [showHistory, setShowHistory] = useState(false);
+  const [snapshotsLoaded, setSnapshotsLoaded] = useState(false);
+  const [rollbackTarget, setRollbackTarget] = useState<string | null>(null);
+  const [isRollingBack, setIsRollingBack] = useState(false);
+
+  const loadSnapshots = async () => {
+    if (!session?.user?.email) return;
+    try {
+      const res = await fetch('/api/sync');
+      if (res.ok) {
+        const { snapshots: s } = await res.json();
+        setSnapshots(s || []);
+        setSnapshotsLoaded(true);
+      }
+    } catch {}
+  };
+
+  const handleUpload = async () => {
+    await upload();
+    if (showHistory) await loadSnapshots();
+  };
+
+  const toggleHistory = () => {
+    const next = !showHistory;
+    setShowHistory(next);
+    if (next && !snapshotsLoaded) loadSnapshots();
+  };
+
+  const handleRollback = async () => {
+    if (!rollbackTarget) return;
+    try {
+      setIsRollingBack(true);
+      const res = await fetch('/api/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rollbackTo: rollbackTarget }),
+      });
+      if (!res.ok) throw new Error('Falha ao restaurar');
+      const { data } = await res.json();
+      applyCloudData(data);
+      setRollbackTarget(null);
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsRollingBack(false);
+    }
+  };
 
   const handleSignOut = async () => {
-    localStorage.removeItem('cloud_loaded');
-    hasCheckedCloud.current = false;
     await signOut();
+  };
+
+  // When user manually clicks Download — check conflict first
+  const handleDownload = async () => {
+    if (!session?.user?.email) return;
+    try {
+      const res = await fetch('/api/sync');
+      if (!res.ok) return;
+      const { data } = await res.json();
+
+      const localHasData = hasLocalData();
+      const cloudHasData = hasCloudData(data);
+
+      if (localHasData && cloudHasData) {
+        const localT = JSON.parse(localStorage.getItem('finance_transactions') || '[]');
+        const localI = JSON.parse(localStorage.getItem('finance_investments') || '[]');
+        setPendingCloudData(data);
+        setConflictInfo({
+          localTransactions: localT.length,
+          localInvestments: localI.length,
+          cloudTransactions: (data.transactions || []).length,
+          cloudInvestments: (data.investments || []).length,
+        });
+        setShowConflictModal(true);
+      } else {
+        await download();
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleConflictChoice = (choice: 'cloud' | 'local') => {
@@ -113,7 +195,6 @@ export default function ConfiguracoesPage() {
       upload();
     }
 
-    localStorage.setItem('cloud_loaded', 'true');
     setPendingCloudData(null);
     setShowConflictModal(false);
   };
@@ -123,67 +204,18 @@ export default function ConfiguracoesPage() {
     localStorage.removeItem('finance_investments');
     localStorage.removeItem('dashboard_cards');
     localStorage.removeItem('exchange_rates');
-    localStorage.removeItem('cloud_loaded');
     localStorage.removeItem('custom_expense_categories');
     localStorage.removeItem('custom_income_categories');
     localStorage.removeItem('category_translations');
     localStorage.removeItem('hidden_expense_categories');
     localStorage.removeItem('hidden_income_categories');
-
-    upload();
-
+    // Note: intentionally NOT uploading — clears local only
     setShowDeleteModal(false);
     setDeleteConfirmText('');
     window.location.reload();
   };
 
-  useEffect(() => {
-    if (session?.user?.email && !hasCheckedCloud.current && !localStorage.getItem('cloud_loaded')) {
-      hasCheckedCloud.current = true;
-      const loadFromCloud = async () => {
-        try {
-          setLoadingFromCloud(true);
-
-          const response = await fetch('/api/sync');
-
-          if (response.ok) {
-            const { data } = await response.json();
-
-            const localHasData = hasLocalData();
-            const cloudHasData = hasCloudData(data);
-
-            if (localHasData && cloudHasData) {
-              const localT = JSON.parse(localStorage.getItem('finance_transactions') || '[]');
-              const localI = JSON.parse(localStorage.getItem('finance_investments') || '[]');
-              setPendingCloudData(data);
-              setConflictInfo({
-                localTransactions: localT.length,
-                localInvestments: localI.length,
-                cloudTransactions: (data.transactions || []).length,
-                cloudInvestments: (data.investments || []).length,
-              });
-              setShowConflictModal(true);
-              return;
-            } else if (cloudHasData) {
-              applyCloudData(data);
-            } else if (localHasData) {
-              upload();
-            }
-          }
-
-          localStorage.setItem('cloud_loaded', 'true');
-        } catch (error) {
-          console.error('Erro ao carregar dados da nuvem:', error);
-          hasCheckedCloud.current = false;
-        } finally {
-          setLoadingFromCloud(false);
-        }
-      };
-
-      loadFromCloud();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session]);
+  // snapshots are loaded lazily when history accordion is opened
 
   return (
     <AppLayout>
@@ -242,7 +274,8 @@ export default function ConfiguracoesPage() {
                 {t('settings.connectGoogle')}
               </Button>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3">
+                {/* User info + sign out */}
                 <div className="flex flex-wrap items-center gap-4 p-4 bg-white rounded-xl border border-gray-200">
                   {session.user?.image && (
                     <Image
@@ -268,84 +301,122 @@ export default function ConfiguracoesPage() {
                   </Button>
                 </div>
 
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 bg-white rounded-xl border border-gray-200">
-                  <div className="flex items-center gap-3">
-                    {isSyncing ? (
-                      <>
-                        <RefreshCw className="w-5 h-5 text-blue-500 animate-spin" />
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">
-                            {t('settings.syncing')}
-                          </p>
-                          <p className="text-xs text-gray-500">{t('settings.savingData')}</p>
-                        </div>
-                      </>
-                    ) : syncError ? (
-                      <>
-                        <AlertCircle className="w-5 h-5 text-red-500" />
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">
-                            {t('settings.syncError')}
-                          </p>
-                          <p className="text-xs text-gray-500">{syncError}</p>
-                        </div>
-                      </>
+                {/* Upload / Download */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 bg-white rounded-xl border border-gray-200">
+                  <div className="flex-1 min-w-0">
+                    {syncError ? (
+                      <div className="flex items-center gap-2 text-red-600">
+                        <AlertCircle className="w-4 h-4 shrink-0" />
+                        <p className="text-xs">{syncError}</p>
+                      </div>
                     ) : lastSyncTime ? (
-                      <>
-                        <Check className="w-5 h-5 text-green-500" />
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">
-                            {t('settings.synced')}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {t('settings.lastSync')}:{' '}
-                            {new Date(lastSyncTime).toLocaleTimeString(locale)}
-                          </p>
-                        </div>
-                      </>
+                      <p className="text-xs text-gray-500">
+                        {t('settings.lastSync')}: {new Date(lastSyncTime).toLocaleString(locale)}
+                      </p>
                     ) : (
-                      <>
-                        <Cloud className="w-5 h-5 text-gray-400" />
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">
-                            {t('settings.waitingChanges')}
-                          </p>
-                          <p className="text-xs text-gray-500">{t('settings.autoSyncActive')}</p>
-                        </div>
-                      </>
+                      <p className="text-xs text-gray-400">{t('settings.noSyncYet')}</p>
                     )}
                   </div>
-
                   <div className="flex gap-2 w-full sm:w-auto">
                     <Button
-                      onClick={() => download()}
+                      onClick={handleDownload}
                       disabled={isSyncing}
                       variant="outline"
                       size="sm"
                       className="gap-2 flex-1 sm:flex-none"
                     >
                       <Download className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
-                      <span className="sm:inline">{t('settings.download')}</span>
+                      {t('settings.download')}
                     </Button>
                     <Button
-                      onClick={() => upload()}
+                      onClick={handleUpload}
                       disabled={isSyncing}
-                      variant="outline"
                       size="sm"
-                      className="gap-2 flex-1 sm:flex-none"
+                      className="gap-2 flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white"
                     >
                       <Upload className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
-                      <span className="sm:inline">{t('settings.upload')}</span>
+                      {t('settings.upload')}
                     </Button>
                   </div>
                 </div>
 
-                {loadingFromCloud && (
-                  <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-100 rounded-lg">
-                    <RefreshCw className="w-4 h-4 text-blue-600 animate-spin" />
-                    <p className="text-sm text-blue-700">{t('settings.loadingCloud')}</p>
-                  </div>
-                )}
+                {/* Commit History */}
+                <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                  <button
+                    onClick={toggleHistory}
+                    className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <History className="w-4 h-4 text-gray-500" />
+                      <span className="text-sm font-medium text-gray-700">
+                        {t('settings.commitHistory')}
+                      </span>
+                      {snapshots.length > 0 && (
+                        <span className="text-xs bg-gray-100 text-gray-500 rounded-full px-2 py-0.5">
+                          {snapshots.length}
+                        </span>
+                      )}
+                    </div>
+                    {showHistory ? (
+                      <ChevronUp className="w-4 h-4 text-gray-400" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4 text-gray-400" />
+                    )}
+                  </button>
+
+                  <AnimatePresence>
+                    {showHistory && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="border-t border-gray-100 divide-y divide-gray-50 max-h-72 overflow-y-auto">
+                          {snapshots.length === 0 ? (
+                            <p className="text-xs text-gray-400 p-4 text-center">
+                              {t('settings.noCommits')}
+                            </p>
+                          ) : (
+                            snapshots.map((snap, i) => (
+                              <div
+                                key={snap.savedAt}
+                                className="flex items-center justify-between px-4 py-3 hover:bg-gray-50"
+                              >
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-xs font-semibold text-gray-700">
+                                    {new Date(snap.savedAt).toLocaleString(locale)}
+                                  </p>
+                                  <p className="text-[11px] text-gray-400 mt-0.5">
+                                    {snap.transactionsCount} {t('settings.conflictTransactions')} ·{' '}
+                                    {snap.investmentsCount} {t('settings.conflictInvestments')}
+                                  </p>
+                                </div>
+                                {i === 0 && (
+                                  <span className="mr-3 text-[9px] bg-blue-100 text-blue-600 rounded px-1.5 py-0.5 font-bold">
+                                    atual
+                                  </span>
+                                )}
+                                {i > 0 && (
+                                  <button
+                                    onClick={() =>
+                                      setRollbackTarget(new Date(snap.savedAt).toISOString())
+                                    }
+                                    className="flex items-center gap-1 text-xs text-amber-600 hover:text-amber-700 font-medium shrink-0"
+                                  >
+                                    <RotateCcw className="w-3 h-3" />
+                                    {t('settings.rollback')}
+                                  </button>
+                                )}
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
             )}
           </motion.div>
@@ -435,7 +506,7 @@ export default function ConfiguracoesPage() {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-lg font-bold text-gray-900">{t('settings.clearData')}</h2>
-                <p className="text-sm text-gray-500 mt-1">{t('settings.clearDataDesc')}</p>
+                <p className="text-sm text-gray-500 mt-1">{t('settings.clearDataLocalDesc')}</p>
               </div>
               <Button
                 onClick={() => setShowDeleteModal(true)}
@@ -574,7 +645,7 @@ export default function ConfiguracoesPage() {
                 </button>
               </div>
 
-              <p className="text-sm text-gray-600 mb-4">{t('settings.clearConfirmDesc')}</p>
+              <p className="text-sm text-gray-600 mb-4">{t('settings.clearConfirmLocalDesc')}</p>
 
               <div className="mb-4">
                 <label className="text-sm font-medium text-gray-700 block mb-2">
@@ -609,6 +680,59 @@ export default function ConfiguracoesPage() {
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
                   {t('settings.clearConfirmBtn')}
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      {/* Rollback confirmation modal */}
+      <AnimatePresence>
+        {rollbackTarget && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+            onClick={() => setRollbackTarget(null)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+                  <RotateCcw className="w-5 h-5 text-amber-600" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-gray-900">
+                    {t('settings.rollbackTitle')}
+                  </h3>
+                  <p className="text-xs text-gray-500">
+                    {new Date(rollbackTarget).toLocaleString(locale)}
+                  </p>
+                </div>
+              </div>
+              <p className="text-sm text-gray-600 mb-5">{t('settings.rollbackDesc')}</p>
+              <div className="flex gap-3">
+                <Button
+                  onClick={() => setRollbackTarget(null)}
+                  variant="outline"
+                  className="flex-1"
+                  disabled={isRollingBack}
+                >
+                  {t('forms.cancel')}
+                </Button>
+                <Button
+                  onClick={handleRollback}
+                  disabled={isRollingBack}
+                  className="flex-1 bg-amber-500 hover:bg-amber-600 text-white gap-2"
+                >
+                  <RotateCcw className={`w-4 h-4 ${isRollingBack ? 'animate-spin' : ''}`} />
+                  {t('settings.rollbackConfirm')}
                 </Button>
               </div>
             </motion.div>

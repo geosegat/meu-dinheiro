@@ -178,7 +178,16 @@
     "useCloudData": "Usar datos de la nube",
     "useCloudDataDesc": "Reemplaza los datos locales con los guardados en tu cuenta de Google",
     "useLocalData": "Usar datos de este dispositivo",
-    "useLocalDataDesc": "Mantiene los datos locales y los sube a la nube"
+    "useLocalDataDesc": "Mantiene los datos locales y los sube a la nube",
+    "noSyncYet": "Ninguna subida realizada aún",
+    "commitHistory": "Historial de Subidas",
+    "noCommits": "Aún no hay subidas a la nube. Haz clic en Subir para crear un punto de restauración.",
+    "rollback": "Restaurar",
+    "rollbackTitle": "¿Restaurar este punto?",
+    "rollbackDesc": "Tus datos locales serán reemplazados por el contenido de este snapshot. Esta acción no se puede deshacer.",
+    "rollbackConfirm": "Restaurar",
+    "clearDataLocalDesc": "Elimina todas las transacciones, inversiones y configuraciones de tarjetas solo localmente. Los datos en la nube no se ven afectados.",
+    "clearConfirmLocalDesc": "Esto eliminará todos tus datos locales. Los datos subidos a la nube permanecen intactos y pueden restaurarse en cualquier momento."
   },
   "categories": {
     "title": "Categorías",
@@ -283,6 +292,18 @@
       "description": "Cuánto puedes gastar por día hasta el próximo ingreso",
       "daysUntilIncome": "días hasta próximo ingreso",
       "daysLeft": "días restantes del mes"
+    },
+    "dailyLimit": {
+      "title": "Límite Diario",
+      "description": "Controla cuánto puedes gastar hoy",
+      "limit": "Límite",
+      "today": "Hoy",
+      "remaining": "disponible hoy",
+      "over": "sobre el límite",
+      "setLimitHint": "Define tu límite diario",
+      "editLimit": "Editar límite",
+      "history": "Ver historial (14 días)",
+      "noExpenses": "sin gastos"
     }
   }
 }

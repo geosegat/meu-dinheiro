@@ -178,7 +178,16 @@
     "useCloudData": "Usar dados da nuvem",
     "useCloudDataDesc": "Substitui os dados locais pelos dados salvos na sua conta Google",
     "useLocalData": "Usar dados deste dispositivo",
-    "useLocalDataDesc": "Mantém os dados locais e envia para a nuvem"
+    "useLocalDataDesc": "Mantém os dados locais e envia para a nuvem",
+    "noSyncYet": "Nenhum envio realizado ainda",
+    "commitHistory": "Histórico de Envios",
+    "noCommits": "Nenhum envio para a nuvem ainda. Clique em Enviar para criar um ponto de restauração.",
+    "rollback": "Restaurar",
+    "rollbackTitle": "Restaurar este ponto?",
+    "rollbackDesc": "Os dados locais serão substituídos pelo conteúdo deste snapshot. Esta ação não pode ser desfeita.",
+    "rollbackConfirm": "Restaurar",
+    "clearDataLocalDesc": "Remove todas as transações, investimentos e configurações de cards apenas localmente. Os dados na nuvem não são afetados.",
+    "clearConfirmLocalDesc": "Isso vai remover todos os seus dados locais. Os dados enviados para a nuvem permanecem intactos e podem ser restaurados a qualquer momento."
   },
   "categories": {
     "title": "Categorias",
@@ -283,6 +292,18 @@
       "description": "Quanto pode gastar por dia até a próxima renda",
       "daysUntilIncome": "dias até próxima renda",
       "daysLeft": "dias restantes no mês"
+    },
+    "dailyLimit": {
+      "title": "Limite Diário",
+      "description": "Acompanhe quanto ainda pode gastar hoje",
+      "limit": "Limite",
+      "today": "Hoje",
+      "remaining": "disponível hoje",
+      "over": "acima do limite",
+      "setLimitHint": "Defina seu limite diário",
+      "editLimit": "Editar limite",
+      "history": "Ver histórico (14 dias)",
+      "noExpenses": "sem gastos"
     }
   }
 }

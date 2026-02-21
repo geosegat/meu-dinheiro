@@ -178,7 +178,16 @@
     "useCloudData": "Use cloud data",
     "useCloudDataDesc": "Replace local data with data saved in your Google account",
     "useLocalData": "Use data from this device",
-    "useLocalDataDesc": "Keep local data and upload to the cloud"
+    "useLocalDataDesc": "Keep local data and upload to the cloud",
+    "noSyncYet": "No uploads yet",
+    "commitHistory": "Upload History",
+    "noCommits": "No uploads to the cloud yet. Click Upload to create a restore point.",
+    "rollback": "Restore",
+    "rollbackTitle": "Restore this point?",
+    "rollbackDesc": "Your local data will be replaced with the content of this snapshot. This action cannot be undone.",
+    "rollbackConfirm": "Restore",
+    "clearDataLocalDesc": "Removes all transactions, investments and card settings locally only. Data in the cloud is not affected.",
+    "clearConfirmLocalDesc": "This will remove all your local data. Data uploaded to the cloud remains intact and can be restored at any time."
   },
   "categories": {
     "title": "Categories",
@@ -283,6 +292,18 @@
       "description": "How much you can spend per day until next income",
       "daysUntilIncome": "days until next income",
       "daysLeft": "days left in the month"
+    },
+    "dailyLimit": {
+      "title": "Daily Limit",
+      "description": "Track how much you can still spend today",
+      "limit": "Limit",
+      "today": "Today",
+      "remaining": "left today",
+      "over": "over limit",
+      "setLimitHint": "Set your daily limit",
+      "editLimit": "Edit limit",
+      "history": "View history (14 days)",
+      "noExpenses": "no expenses"
     }
   }
 }
