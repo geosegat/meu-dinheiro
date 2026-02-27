@@ -30,6 +30,8 @@ function applyCloudData(data: Record<string, unknown>) {
     );
   if (data.hidden_income_categories)
     localStorage.setItem('hidden_income_categories', JSON.stringify(data.hidden_income_categories));
+  if (data.daily_limit_value != null)
+    localStorage.setItem('daily-limit-value', String(data.daily_limit_value));
 }
 
 function getLocalData() {
@@ -49,14 +51,15 @@ function getLocalData() {
       localStorage.getItem('hidden_expense_categories') || '[]'
     ),
     hidden_income_categories: JSON.parse(localStorage.getItem('hidden_income_categories') || '[]'),
+    daily_limit_value: localStorage.getItem('daily-limit-value') ?? null,
   };
 }
 
 interface UseAutoSyncReturn {
   isSyncing: boolean;
   lastSyncTime: Date | null;
-  upload: () => Promise<void>;
-  download: () => Promise<void>;
+  upload: () => Promise<boolean>;
+  download: () => Promise<boolean>;
   error: string | null;
 }
 
@@ -68,8 +71,8 @@ export function useAutoSync(): UseAutoSyncReturn {
   const isSyncingRef = useRef(false);
 
   // Envia dados locais para a nuvem
-  const upload = useCallback(async () => {
-    if (!session?.user?.email || isSyncingRef.current) return;
+  const upload = useCallback(async (): Promise<boolean> => {
+    if (!session?.user?.email || isSyncingRef.current) return false;
 
     try {
       isSyncingRef.current = true;
@@ -85,9 +88,11 @@ export function useAutoSync(): UseAutoSyncReturn {
       if (!response.ok) throw new Error('Erro ao enviar dados');
 
       setLastSyncTime(new Date());
+      return true;
     } catch (err) {
       console.error('Erro no upload:', err);
       setError(err instanceof Error ? err.message : 'Erro desconhecido');
+      return false;
     } finally {
       isSyncingRef.current = false;
       setIsSyncing(false);
@@ -95,8 +100,8 @@ export function useAutoSync(): UseAutoSyncReturn {
   }, [session]);
 
   // Puxa dados da nuvem e aplica localmente
-  const download = useCallback(async () => {
-    if (!session?.user?.email || isSyncingRef.current) return;
+  const download = useCallback(async (): Promise<boolean> => {
+    if (!session?.user?.email || isSyncingRef.current) return false;
 
     try {
       isSyncingRef.current = true;
@@ -106,7 +111,7 @@ export function useAutoSync(): UseAutoSyncReturn {
       const response = await fetch('/api/sync');
       if (!response.ok) throw new Error('Erro ao baixar dados');
 
-      const { data, lastSync } = await response.json();
+      const { data } = await response.json();
 
       if (data) {
         applyCloudData(data);
@@ -115,9 +120,11 @@ export function useAutoSync(): UseAutoSyncReturn {
           new CustomEvent('localStorageChange', { detail: { key: 'poll_update' } })
         );
       }
+      return true;
     } catch (err) {
       console.error('Erro no download:', err);
       setError(err instanceof Error ? err.message : 'Erro desconhecido');
+      return false;
     } finally {
       isSyncingRef.current = false;
       setIsSyncing(false);

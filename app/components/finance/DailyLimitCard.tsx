@@ -64,6 +64,9 @@ export default function DailyLimitCard({ transactions, delay = 0 }: DailyLimitCa
     return { date: dayStart, spent, isToday: i === 13, label };
   });
 
+  const goodDays = dailyLimit > 0 ? last14Days.filter((d) => d.spent <= dailyLimit).length : 0;
+  const badDays = dailyLimit > 0 ? last14Days.filter((d) => d.spent > dailyLimit).length : 0;
+
   const startEdit = () => {
     setEditValue(dailyLimit > 0 ? String(dailyLimit) : '');
     setIsEditing(true);
@@ -203,9 +206,10 @@ export default function DailyLimitCard({ transactions, delay = 0 }: DailyLimitCa
                 const isSelected = selectedDay === i;
 
                 let dotColor = 'bg-gray-200';
-                if (hasSpent) dotColor = isOverLimit ? 'bg-rose-400' : 'bg-emerald-400';
+                if (dailyLimit > 0 || hasSpent)
+                  dotColor = isOverLimit ? 'bg-rose-400' : 'bg-emerald-400';
                 if (isSelected) dotColor = isOverLimit ? 'bg-rose-600' : 'bg-emerald-600';
-                if (d.isToday && hasSpent)
+                if (d.isToday && (dailyLimit > 0 || hasSpent))
                   dotColor = isOverLimit
                     ? 'bg-rose-500 ring-2 ring-rose-300'
                     : 'bg-emerald-500 ring-2 ring-emerald-300';
@@ -218,7 +222,7 @@ export default function DailyLimitCard({ transactions, delay = 0 }: DailyLimitCa
                     title={`${d.date.getDate()}/${d.date.getMonth() + 1}: ${formatCurrency(d.spent)}`}
                   >
                     <span
-                      className={`w-full h-2 rounded-full transition-all ${dotColor} ${!hasSpent ? 'opacity-40' : ''} ${isSelected ? 'scale-110' : 'group-hover:scale-105'}`}
+                      className={`w-full h-2 rounded-full transition-all ${dotColor} ${!hasSpent && dailyLimit === 0 ? 'opacity-40' : ''} ${isSelected ? 'scale-110' : 'group-hover:scale-105'}`}
                     />
                     <span
                       className={`text-[8px] ${d.isToday ? 'font-bold text-gray-700' : 'text-gray-400'}`}
@@ -229,6 +233,21 @@ export default function DailyLimitCard({ transactions, delay = 0 }: DailyLimitCa
                 );
               })}
             </div>
+
+            {/* Resumo 14 dias */}
+            {dailyLimit > 0 && (
+              <div className="flex items-center gap-2 mt-2.5">
+                <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2 py-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  {goodDays}
+                </span>
+                <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-rose-700 bg-rose-50 border border-rose-100 rounded-full px-2 py-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                  {badDays}
+                </span>
+                <span className="text-[9px] text-gray-300 ml-auto">14 dias</span>
+              </div>
+            )}
 
             {/* Detalhe do dia clicado */}
             <AnimatePresence>

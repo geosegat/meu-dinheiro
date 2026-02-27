@@ -24,6 +24,8 @@ import AppLayout from '../components/layout/AppLayout';
 import { useTranslation } from '@/app/i18n/useTranslation';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import { useAutoSync } from '@/app/components/hooks/useAutoSync';
+import { useToast } from '@/app/components/hooks/useToast';
+import { ToastContainer } from '@/app/components/ui/Toast';
 
 const localeOptions = [
   { value: 'pt-BR' as const, flag: '🇧🇷', label: 'PT' },
@@ -83,6 +85,8 @@ function applyCloudData(data: CloudData) {
     );
   if (data.hidden_income_categories)
     localStorage.setItem('hidden_income_categories', JSON.stringify(data.hidden_income_categories));
+  if (data.daily_limit_value != null)
+    localStorage.setItem('daily-limit-value', String(data.daily_limit_value));
 }
 
 export default function ConfiguracoesPage() {
@@ -90,6 +94,7 @@ export default function ConfiguracoesPage() {
     useTranslation();
   const { data: session } = useSession();
   const { isSyncing, lastSyncTime, upload, download, error: syncError } = useAutoSync();
+  const { toasts, showToast, dismiss } = useToast();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [showConflictModal, setShowConflictModal] = useState(false);
@@ -123,7 +128,8 @@ export default function ConfiguracoesPage() {
   };
 
   const handleUpload = async () => {
-    await upload();
+    const ok = await upload();
+    if (ok) showToast(t('settings.uploadSuccess'), 'success');
     if (showHistory) await loadSnapshots();
   };
 
@@ -146,7 +152,8 @@ export default function ConfiguracoesPage() {
       const { data } = await res.json();
       applyCloudData(data);
       setRollbackTarget(null);
-      window.location.reload();
+      showToast(t('settings.rollbackSuccess'), 'success');
+      setTimeout(() => window.location.reload(), 1500);
     } catch (err) {
       console.error(err);
     } finally {
@@ -181,18 +188,21 @@ export default function ConfiguracoesPage() {
         });
         setShowConflictModal(true);
       } else {
-        await download();
+        const ok = await download();
+        if (ok) showToast(t('settings.downloadSuccess'), 'success');
       }
     } catch (err) {
       console.error(err);
     }
   };
 
-  const handleConflictChoice = (choice: 'cloud' | 'local') => {
+  const handleConflictChoice = async (choice: 'cloud' | 'local') => {
     if (choice === 'cloud') {
       applyCloudData(pendingCloudData);
+      showToast(t('settings.downloadSuccess'), 'success');
     } else {
-      upload();
+      const ok = await upload();
+      if (ok) showToast(t('settings.uploadSuccess'), 'success');
     }
 
     setPendingCloudData(null);
@@ -739,6 +749,8 @@ export default function ConfiguracoesPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <ToastContainer toasts={toasts} onDismiss={dismiss} />
     </AppLayout>
   );
 }
