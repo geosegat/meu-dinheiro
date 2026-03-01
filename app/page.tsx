@@ -85,9 +85,13 @@ export default function DashboardPage() {
     .filter((tx) => tx.type === 'expense')
     .reduce((sum, tx) => sum + tx.amount, 0);
 
-  const currentBalance = pastTransactions.reduce((sum, tx) => {
-    return tx.type === 'income' ? sum + tx.amount : sum - tx.amount;
-  }, 0);
+  // Balance uses ALL past transactions regardless of selected period,
+  // so surplus from previous months carries over correctly.
+  const currentBalance = transactions
+    .filter((tx) => new Date(tx.date) <= now)
+    .reduce((sum, tx) => {
+      return tx.type === 'income' ? sum + tx.amount : sum - tx.amount;
+    }, 0);
 
   const recentTransactions = [...transactions]
     .filter((tx) => new Date(tx.date) <= now)
@@ -206,7 +210,7 @@ export default function DashboardPage() {
               <CategoryBreakdown transactions={filteredTransactions} type="expense" />
             </div>
             <div className="lg:col-span-1">
-              <MonthlyChart transactions={filteredTransactions} />
+              <MonthlyChart transactions={filteredTransactions} currentBalance={currentBalance} />
             </div>
           </div>
 

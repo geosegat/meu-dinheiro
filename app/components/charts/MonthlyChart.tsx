@@ -8,14 +8,18 @@ import { useTranslation } from '@/app/i18n/useTranslation';
 
 interface MonthlyChartProps {
   transactions: Transaction[];
+  currentBalance?: number;
 }
 
-export default function MonthlyChart({ transactions }: MonthlyChartProps) {
+export default function MonthlyChart({
+  transactions,
+  currentBalance: balanceProp,
+}: MonthlyChartProps) {
   const { t, formatCurrency } = useTranslation();
 
   const now = new Date();
   now.setHours(23, 59, 59, 999);
-  
+
   const pastTransactions = transactions.filter((tx) => new Date(tx.date) <= now);
   const futureTransactions = transactions.filter((tx) => new Date(tx.date) > now);
 
@@ -41,14 +45,18 @@ export default function MonthlyChart({ transactions }: MonthlyChartProps) {
   const futureIncome = futureTransactions
     .filter((t) => t.type === 'income')
     .reduce((sum, t) => sum + t.amount, 0);
-  
+
   const futureExpenses = futureTransactions
     .filter((t) => t.type === 'expense')
     .reduce((sum, t) => sum + t.amount, 0);
 
-  const currentBalance = pastTransactions.reduce((sum, tx) => {
-    return tx.type === 'income' ? sum + tx.amount : sum - tx.amount;
-  }, 0);
+  // Use balance passed from parent (all-time) if available, otherwise compute from filtered transactions
+  const currentBalance =
+    balanceProp !== undefined
+      ? balanceProp
+      : pastTransactions.reduce((sum, tx) => {
+          return tx.type === 'income' ? sum + tx.amount : sum - tx.amount;
+        }, 0);
 
   if (transactions.length === 0) {
     return (
@@ -115,13 +123,13 @@ export default function MonthlyChart({ transactions }: MonthlyChartProps) {
 
         <div
           className={`p-4 rounded-xl border-2 ${
-            currentBalance >= 0
-              ? 'bg-blue-50 border-blue-200'
-              : 'bg-orange-50 border-orange-200'
+            currentBalance >= 0 ? 'bg-blue-50 border-blue-200' : 'bg-orange-50 border-orange-200'
           }`}
         >
           <div className="flex items-center justify-between mb-1">
-            <span className="text-sm font-medium text-gray-700">{t('dashboard.currentBalance')}</span>
+            <span className="text-sm font-medium text-gray-700">
+              {t('dashboard.currentBalance')}
+            </span>
             <Wallet className="w-4 h-4 text-gray-600" />
           </div>
           <p
@@ -133,7 +141,8 @@ export default function MonthlyChart({ transactions }: MonthlyChartProps) {
           </p>
           {(futureIncome > 0 || futureExpenses > 0) && (
             <p className="text-xs text-gray-500 mt-1">
-              {t('charts.balance')}: {formatCurrency(currentBalance + futureIncome - futureExpenses)}
+              {t('charts.balance')}:{' '}
+              {formatCurrency(currentBalance + futureIncome - futureExpenses)}
             </p>
           )}
         </div>
