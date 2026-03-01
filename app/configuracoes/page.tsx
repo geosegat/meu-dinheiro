@@ -13,7 +13,6 @@ import {
   X,
   Download,
   Upload,
-  Smartphone,
   History,
   RotateCcw,
   ChevronDown,
@@ -41,21 +40,6 @@ const currencyOptions = [
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type CloudData = Record<string, any> | null;
-
-function hasLocalData(): boolean {
-  const transactions = localStorage.getItem('finance_transactions');
-  const investments = localStorage.getItem('finance_investments');
-  const parsedT = transactions ? JSON.parse(transactions) : [];
-  const parsedI = investments ? JSON.parse(investments) : [];
-  return parsedT.length > 0 || parsedI.length > 0;
-}
-
-function hasCloudData(data: CloudData): boolean {
-  if (!data) return false;
-  const t = data.transactions || [];
-  const i = data.investments || [];
-  return t.length > 0 || i.length > 0;
-}
 
 function applyCloudData(data: CloudData) {
   if (!data) return;
@@ -97,14 +81,6 @@ export default function ConfiguracoesPage() {
   const { toasts, showToast, dismiss } = useToast();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
-  const [showConflictModal, setShowConflictModal] = useState(false);
-  const [pendingCloudData, setPendingCloudData] = useState<CloudData>(null);
-  const [conflictInfo, setConflictInfo] = useState({
-    localTransactions: 0,
-    localInvestments: 0,
-    cloudTransactions: 0,
-    cloudInvestments: 0,
-  });
 
   // Commit history
   const [snapshots, setSnapshots] = useState<
@@ -165,48 +141,14 @@ export default function ConfiguracoesPage() {
     await signOut();
   };
 
-  // When user manually clicks Download — check conflict first
   const handleDownload = async () => {
     if (!session?.user?.email) return;
     try {
-      const res = await fetch('/api/sync');
-      if (!res.ok) return;
-      const { data } = await res.json();
-
-      const localHasData = hasLocalData();
-      const cloudHasData = hasCloudData(data);
-
-      if (localHasData && cloudHasData) {
-        const localT = JSON.parse(localStorage.getItem('finance_transactions') || '[]');
-        const localI = JSON.parse(localStorage.getItem('finance_investments') || '[]');
-        setPendingCloudData(data);
-        setConflictInfo({
-          localTransactions: localT.length,
-          localInvestments: localI.length,
-          cloudTransactions: (data.transactions || []).length,
-          cloudInvestments: (data.investments || []).length,
-        });
-        setShowConflictModal(true);
-      } else {
-        const ok = await download();
-        if (ok) showToast(t('settings.downloadSuccess'), 'success');
-      }
+      const ok = await download();
+      if (ok) showToast(t('settings.downloadSuccess'), 'success');
     } catch (err) {
       console.error(err);
     }
-  };
-
-  const handleConflictChoice = async (choice: 'cloud' | 'local') => {
-    if (choice === 'cloud') {
-      applyCloudData(pendingCloudData);
-      showToast(t('settings.downloadSuccess'), 'success');
-    } else {
-      const ok = await upload();
-      if (ok) showToast(t('settings.uploadSuccess'), 'success');
-    }
-
-    setPendingCloudData(null);
-    setShowConflictModal(false);
   };
 
   const handleClearData = () => {
@@ -530,96 +472,6 @@ export default function ConfiguracoesPage() {
           </motion.div>
         </div>
       </div>
-
-      {/* Modal de conflito de sincronização */}
-      <AnimatePresence>
-        {showConflictModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white rounded-2xl p-6 w-full max-w-lg shadow-xl"
-            >
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
-                  <AlertCircle className="w-5 h-5 text-amber-600" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900">{t('settings.conflictTitle')}</h3>
-                  <p className="text-sm text-gray-500">{t('settings.conflictDesc')}</p>
-                </div>
-              </div>
-
-              {/* Comparação visual */}
-              <div className="grid grid-cols-2 gap-3 mb-5">
-                <div className="p-4 rounded-xl bg-blue-50 border border-blue-100">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Cloud className="w-4 h-4 text-blue-600" />
-                    <span className="text-sm font-semibold text-blue-900">
-                      {t('settings.cloudData')}
-                    </span>
-                  </div>
-                  <p className="text-xs text-blue-700">
-                    {conflictInfo.cloudTransactions} {t('settings.conflictTransactions')}
-                  </p>
-                  <p className="text-xs text-blue-700">
-                    {conflictInfo.cloudInvestments} {t('settings.conflictInvestments')}
-                  </p>
-                </div>
-                <div className="p-4 rounded-xl bg-green-50 border border-green-100">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Smartphone className="w-4 h-4 text-green-600" />
-                    <span className="text-sm font-semibold text-green-900">
-                      {t('settings.localData')}
-                    </span>
-                  </div>
-                  <p className="text-xs text-green-700">
-                    {conflictInfo.localTransactions} {t('settings.conflictTransactions')}
-                  </p>
-                  <p className="text-xs text-green-700">
-                    {conflictInfo.localInvestments} {t('settings.conflictInvestments')}
-                  </p>
-                </div>
-              </div>
-
-              {/* Opções */}
-              <div className="space-y-3">
-                <button
-                  onClick={() => handleConflictChoice('cloud')}
-                  className="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-blue-200 bg-blue-50/50 hover:bg-blue-100 transition-colors text-left"
-                >
-                  <Download className="w-5 h-5 text-blue-600 shrink-0" />
-                  <div>
-                    <p className="text-sm font-semibold text-gray-900">
-                      {t('settings.useCloudData')}
-                    </p>
-                    <p className="text-xs text-gray-500">{t('settings.useCloudDataDesc')}</p>
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => handleConflictChoice('local')}
-                  className="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-green-200 bg-green-50/50 hover:bg-green-100 transition-colors text-left"
-                >
-                  <Upload className="w-5 h-5 text-green-600 shrink-0" />
-                  <div>
-                    <p className="text-sm font-semibold text-gray-900">
-                      {t('settings.useLocalData')}
-                    </p>
-                    <p className="text-xs text-gray-500">{t('settings.useLocalDataDesc')}</p>
-                  </div>
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Modal de confirmação de limpeza */}
       <AnimatePresence>
